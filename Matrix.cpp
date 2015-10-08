@@ -199,3 +199,4 @@ double &Matrix::operator()( const unsigned int i, const unsigned int j ) const
 
 	return top_[ i + j * m_ ];
 }
+
