@@ -52,8 +52,14 @@ public:
   double &operator[]( const unsigned int i ) const;
   double &operator()( const unsigned int i, const unsigned int j ) const;
 
-
+  /*
+  template<typename CharT, typename Traits>
+  std::basic_ostream<CharT, Traits>&
+  operator<<(std::basic_ostream<CharT, Traits>& os, const Matrix& ma);
+  */
+  friend std::ostream& operator<<(std::ostream& os, const Matrix& ma);
 };
+
 
 #endif /* MATRIX_HPP_ */
 

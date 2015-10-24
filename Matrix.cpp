@@ -1,6 +1,5 @@
 //  Matrix.cpp
 
-
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -199,4 +198,79 @@ double &Matrix::operator()( const unsigned int i, const unsigned int j ) const
 
 	return top_[ i + j * m_ ];
 }
+/*
+template<typename CharT, typename Traits>
+std::basic_ostream<CharT, Traits>&
+operator<<(std::basic_ostream<CharT, Traits>& os, const Matrix& ma){
+  
+  int m_ = ma.m();
+  int n_ = ma.n();
+  int mb_ = ma.mb();
+  int nb_ = ma.nb();
+  int p_ = ma.p();
+  int q_ = ma.q();
+  
+  for (int i=0; i<m_; i++) {
+    for (int j=0; j<n_; j++) {
+      int p=0;
 
+      // (i / mb_) ti
+      if( (i / mb_) != p_-1){
+	p += (i / mb_)*mb_*n_; //tiの場所
+	p += (j / nb_)*mb_*nb_;//tjの場所
+
+
+	p += (j % nb_)*mb_ + (i % mb_);//i,jの場所
+      }
+      else{
+      //ここで最終行の時と差別化
+	p += (p_-1)*mb_*n_;//tiの場所
+	p += (m_%mb_ == 0) ? (j/nb_)*mb_*nb_ : (j/nb_)*(m_%mb_)*nb_;//tjの場所
+	p += (m_%mb_ == 0) ? (j%nb_)*mb_ + (i%mb_) : (j%nb_)*(m_%mb_) + (i%mb_);
+      }
+
+      os << ma[p] << " ";
+    }
+    os << std::endl;
+  }
+  
+  return os;
+}
+*/
+
+
+std::ostream& operator<<(std::ostream& os, const Matrix& ma){
+  
+  int m_ = ma.m();
+  int n_ = ma.n();
+  int mb_ = ma.mb();
+  int nb_ = ma.nb();
+  int p_ = ma.p();
+  int q_ = ma.q();
+  
+  for (int i=0; i<m_; i++) {
+    for (int j=0; j<n_; j++) {
+      int p=0;
+
+      // (i / mb_) ti
+      if( (i / mb_) != p_-1){
+	p += (i / mb_)*mb_*n_; //tiの場所
+	p += (j / nb_)*mb_*nb_;//tjの場所
+
+
+	p += (j % nb_)*mb_ + (i % mb_);//i,jの場所
+      }
+      else{
+      //ここで最終行の時と差別化
+	p += (p_-1)*mb_*n_;//tiの場所
+	p += (m_%mb_ == 0) ? (j/nb_)*mb_*nb_ : (j/nb_)*(m_%mb_)*nb_;//tjの場所
+	p += (m_%mb_ == 0) ? (j%nb_)*mb_ + (i%mb_) : (j%nb_)*(m_%mb_) + (i%mb_);
+      }
+
+      os << ma[p] << " ";
+    }
+    os << std::endl;
+  }
+  
+  return os;
+}
