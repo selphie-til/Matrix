@@ -8,7 +8,7 @@ jobs:
      - name: build
        run: |
         pwd
-	ls
+        ls
         mkdir builds
         cd ./builds
         cmake ..
