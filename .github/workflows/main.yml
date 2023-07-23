@@ -12,7 +12,6 @@ jobs:
         mkdir builds
         cd ./builds
         cmake ..
-        cmake --build .
      - name: test
        run: |
         ./builds/test/Tiled_Matrix_googletest
