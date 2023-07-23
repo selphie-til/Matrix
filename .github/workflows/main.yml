@@ -7,6 +7,8 @@ jobs:
     steps:
      - name: build
        run: |
+        pwd
+	ls
         mkdir builds
         cd ./builds
         cmake ..
