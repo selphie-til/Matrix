@@ -1,0 +1,16 @@
+name: CI
+
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+     - name: build
+       run: |
+        mkdir builds
+        cd ./builds
+        cmake ..
+        cmake --build .
+     - name: test
+       run: |
+        ./builds/test/Tiled_Matrix_googletest
