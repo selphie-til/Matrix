@@ -31,17 +31,17 @@ public:
     unsigned int m() const { return m_; }
     unsigned int n() const { return n_; }
     unsigned int mb() const { return mb_; }
-    unsigned int mb(const int ti, const int tj) {
+    unsigned int mb(const int ti, const int tj) const {
 	return (ti == p_ - 1 ? m_ % mb_ : mb_);
     }
     unsigned int nb() const { return nb_; }
-    unsigned int nb(const int ti, const int tj) {
+    unsigned int nb(const int ti, const int tj) const {
 	return (tj == q_ - 1 ? n_ % nb_ : nb_);
     }
     unsigned int p() const { return p_; }
     unsigned int q() const { return q_; }
     
-    // Assign randam numbers to matrix elements
+    // Assign random numbers to matrix elements
     void gen_rnd_elm();
     // the pointer of the (i,j) element
     double *elm(const int, const int);
@@ -52,6 +52,7 @@ public:
     
     // Operator overload
     Matrix &operator=(const Matrix &T);
+    Matrix operator+(const Matrix &T);
     bool operator==(const Matrix &T);
     double &operator[](const unsigned int i) const;
     double &operator()(const unsigned int i, const unsigned int j) const;

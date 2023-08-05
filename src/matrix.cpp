@@ -162,6 +162,18 @@ Matrix &Matrix::operator=(const Matrix &T) {
     return *this;
 }
 
+Matrix Matrix::operator+(const Matrix &T) {
+    assert(m_ == T.m_);
+    assert(n_ == T.n_);
+
+    Matrix M(m_, n_, mb_, nb_);
+    for(int i=0; i<m_*n_; ++i){
+        M[i] = this->operator[](i) + T[i];
+    }
+
+    return M;
+}
+
 bool Matrix::operator==(const Matrix &T) {
     if (m_ != T.m_ || n_ != T.n_) {
 	return false;
