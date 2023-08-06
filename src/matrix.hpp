@@ -52,7 +52,8 @@ public:
     
     // Operator overload
     Matrix &operator=(const Matrix &T);
-    Matrix operator+(const Matrix &T);
+    Matrix operator+(const Matrix &T) const;
+    Matrix operator-(const Matrix &T) const;
     bool operator==(const Matrix &T);
     double &operator[](const unsigned int i) const;
     double &operator()(const unsigned int i, const unsigned int j) const;

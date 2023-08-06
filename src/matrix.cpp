@@ -162,13 +162,25 @@ Matrix &Matrix::operator=(const Matrix &T) {
     return *this;
 }
 
-Matrix Matrix::operator+(const Matrix &T) {
+Matrix Matrix::operator+(const Matrix &T) const {
     assert(m_ == T.m_);
     assert(n_ == T.n_);
 
     Matrix M(m_, n_, mb_, nb_);
     for(int i=0; i<m_*n_; ++i){
         M[i] = this->operator[](i) + T[i];
+    }
+
+    return M;
+}
+
+Matrix Matrix::operator-(const Matrix &T) const {
+    assert(m_ == T.m_);
+    assert(n_ == T.n_);
+
+    Matrix M(m_, n_, mb_, nb_);
+    for(int i=0; i<m_*n_; ++i){
+        M[i] = this->operator[](i) - T[i];
     }
 
     return M;
