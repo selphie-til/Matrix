@@ -9,19 +9,19 @@ protected:
     double *top_;     // pointer to the matrix
     unsigned int m_;  // number of lows of the matrix or lda
     unsigned int n_;  // number of columns of the matrix
-    unsigned int mb_; // number of lows of the tile
-    unsigned int nb_; // number of columns of the tile
-    unsigned int p_;  // number of low tiles
-    unsigned int q_;  // number of column tiles
+    unsigned int mb_{}; // number of lows of the tile
+    unsigned int nb_{}; // number of columns of the tile
+    unsigned int p_{};  // number of low tiles
+    unsigned int q_{};  // number of column tiles
     
 public:
     // Default constructor
     Matrix();
     // Constructor
-    Matrix(const unsigned int m, const unsigned int n);
-    Matrix(const unsigned int m, const unsigned int n, const unsigned int ts);
-    Matrix(const unsigned int m, const unsigned int n, const unsigned int mb,
-	   const unsigned int nb);
+    Matrix(const unsigned int &m, const unsigned int &n);
+    Matrix(const unsigned int &m, const unsigned int &n, const unsigned int &ts);
+    Matrix(const unsigned int &m, const unsigned int &n,
+           const unsigned int &mb, const unsigned int &nb);
 
     // Destructor
     ~Matrix();
@@ -44,19 +44,20 @@ public:
     // Assign random numbers to matrix elements
     void gen_rnd_elm();
     // the pointer of the (i,j) element
-    double *elm(const int, const int);
+    double *elm(const unsigned int &ti, const unsigned int &tj) const;
     // the pointer of the (i,j) element (ti,tj)
-    double *elm(const int, const int, const int, const int);
+    double *elm(const unsigned int &ti, const unsigned int &tj,
+                const unsigned int &i, const unsigned int &j) const;
     
-    void file_out(char *fname);
+    void file_out(const char *fname);
     
     // Operator overload
     Matrix &operator=(const Matrix &T);
     Matrix operator+(const Matrix &T) const;
     Matrix operator-(const Matrix &T) const;
     bool operator==(const Matrix &T);
-    double &operator[](const unsigned int i) const;
-    double &operator()(const unsigned int i, const unsigned int j) const;
+    double &operator[](const unsigned int &i) const;
+    double &operator()(const unsigned int &i, const unsigned int &j) const;
     
     /*
       template<typename CharT, typename Traits>
