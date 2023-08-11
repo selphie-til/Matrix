@@ -47,3 +47,13 @@ TEST(test_matrix, elm) {
 
     EXPECT_TRUE( *(A.elm( 20, 20, 5, 5)) == A(605, 605));
 }
+
+TEST(test_matrix, zero){
+    Matrix A(1000, 1000);
+    A.zero();
+    for(unsigned int i=0; i<1000; ++i){
+        for(unsigned int j=0; j<1000; ++j){
+            EXPECT_TRUE( A(i,j) == 0 );
+        }
+    }
+}

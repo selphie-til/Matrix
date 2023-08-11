@@ -32,11 +32,11 @@ public:
     unsigned int n() const { return n_; }
     unsigned int mb() const { return mb_; }
     unsigned int mb(const int ti, const int tj) const {
-	return (ti == p_ - 1 ? m_ % mb_ : mb_);
+        return (ti == p_ - 1 ? m_ % mb_ : mb_);
     }
     unsigned int nb() const { return nb_; }
     unsigned int nb(const int ti, const int tj) const {
-	return (tj == q_ - 1 ? n_ % nb_ : nb_);
+        return (tj == q_ - 1 ? n_ % nb_ : nb_);
     }
     unsigned int p() const { return p_; }
     unsigned int q() const { return q_; }
@@ -50,6 +50,8 @@ public:
                 const unsigned int &i, const unsigned int &j) const;
     
     void file_out(const char *fname);
+
+    void zero();
     
     // Operator overload
     Matrix &operator=(const Matrix &T);

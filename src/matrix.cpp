@@ -313,3 +313,8 @@ std::ostream &operator<<(std::ostream &os, const Matrix &ma) {
 
     return os;
 }
+
+void Matrix::zero() {
+    for (unsigned int i = 0; i < m_ * n_; ++i)
+        top_[i] = 0.0;
+}
