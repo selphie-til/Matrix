@@ -40,3 +40,10 @@ TEST(test_matrix, minus) {
 
     EXPECT_TRUE( C==D );
 }
+
+TEST(test_matrix, elm) {
+    Matrix A( 1000, 1000, 30);
+    A.gen_rnd_elm();
+
+    EXPECT_TRUE( *(A.elm( 20, 20, 5, 5)) == A(605, 605));
+}

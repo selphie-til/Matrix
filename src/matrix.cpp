@@ -229,8 +229,13 @@ const {
     assert(j < n_);
 
 
+    const unsigned int ti = i / mb_;
+    const unsigned int tj = j / nb_;
+    const unsigned int tp = i % mb_;
+    const unsigned int tq = j % nb_;
+
     //間違っている ti, tj の位置を考慮しないといけない
-    return top_[i + j * m_];
+    return top_[ (mb_*n_)*ti + tp + (mb_*nb_)*tj + (mb_*tq)];
 }
 /*
   template<typename CharT, typename Traits>
