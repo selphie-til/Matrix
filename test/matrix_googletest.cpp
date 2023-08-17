@@ -18,7 +18,7 @@ TEST(test_matrix, plus) {
     Matrix C(1000,1000,30);
     C = A + B;
     Matrix D(1000, 1000, 30);
-    for(int i=0; i< D.m()*D.n(); ++i){
+    for(uint32_t i=0; i< D.m()*D.n(); ++i){
         D[i] = A[i] + B[i];
     }
 
@@ -34,7 +34,7 @@ TEST(test_matrix, minus) {
     Matrix C(1000,1000,30);
     C = A - B;
     Matrix D(1000, 1000, 30);
-    for(int i=0; i< D.m()*D.n(); ++i){
+    for(uint32_t i=0; i< D.m()*D.n(); ++i){
         D[i] = A[i] - B[i];
     }
 
@@ -51,8 +51,8 @@ TEST(test_matrix, elm) {
 TEST(test_matrix, zero){
     Matrix A(1000, 1000);
     A.zero();
-    for(unsigned int i=0; i<1000; ++i){
-        for(unsigned int j=0; j<1000; ++j){
+    for(uint32_t i=0; i<1000; ++i){
+        for(uint32_t j=0; j<1000; ++j){
             EXPECT_TRUE( A(i,j) == 0 );
         }
     }

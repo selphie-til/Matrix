@@ -7,63 +7,6 @@
 
 #include "matrix.hpp"
 
-Matrix::Matrix() {
-    m_ = 0;
-    n_ = 0;
-
-    mb_ = 0;
-    nb_ = 0;
-
-    p_ = 0;
-    q_ = 0;
-
-    top_ = nullptr;
-}
-
-Matrix::Matrix(const unsigned int &m, const unsigned int &n) {
-    
-    m_ = m;
-    n_ = n;
-    
-    mb_ = m;
-    nb_ = n;
-    
-    p_ = 1;
-    q_ = 1;
-    
-    top_ = new double[m_ * n_];
-};
-
-Matrix::Matrix(const unsigned int &m, const unsigned int &n,
-               const unsigned int &ts) {
-    
-    m_ = m;
-    n_ = n;
-    
-    mb_ = ts;
-    nb_ = ts;
-    
-    p_ = (m_ % mb_ == 0) ? m_ / mb_ : m_ / mb_ + 1;
-    q_ = (n_ % nb_ == 0) ? n_ / nb_ : n_ / nb_ + 1;
-    
-    top_ = new double[m_ * n_];
-};
-
-Matrix::Matrix(const unsigned int &m, const unsigned int &n,
-               const unsigned int &mb, const unsigned int &nb) {
-    
-    m_ = m;
-    n_ = n;
-    
-    mb_ = mb;
-    nb_ = nb;
-    
-    p_ = (m_ % mb_ == 0) ? m_ / mb_ : m_ / mb_ + 1;
-    q_ = (n_ % nb_ == 0) ? n_ / nb_ : n_ / nb_ + 1;
-    
-    top_ = new double[m_ * n_];
-};
-
 Matrix::~Matrix() {
     
     delete[] top_;
@@ -78,17 +21,18 @@ void Matrix::gen_rnd_elm() {
     std::mt19937 engine(rdev());
     std::uniform_real_distribution<> dist(0.0, 1.0);
     
-    for (int i = 0; i < m_ * n_; i++)
+    for (uint64_t i = 0; i < m_*n_; ++i) {
         top_[i] = dist(engine);
+    }
 }
 
-double* Matrix::elm(const unsigned int &ti, const unsigned int &tj) const {
+double* Matrix::elm(const uint32_t &ti, const uint32_t &tj) const {
     assert(ti >= 0);
     assert(ti < p_);
     assert(tj >= 0);
     assert(tj < q_);
     
-    unsigned int pos = 0;
+    uint32_t pos = 0;
     
     pos += ti * (mb_ * n_);
     pos += (ti == p_ - 1) ? tj * (m_ % mb_) * nb_ : tj * mb_ * nb_;
@@ -96,8 +40,8 @@ double* Matrix::elm(const unsigned int &ti, const unsigned int &tj) const {
     return &top_[pos];
 }
 
-double* Matrix::elm(const unsigned int &ti, const unsigned int &tj,
-                    const unsigned int &i, const unsigned int &j) const {
+double* Matrix::elm(const uint32_t &ti, const uint32_t &tj,
+                    const uint32_t &i, const uint32_t &j) const {
     assert(i >= 0);
     assert(i < (ti == (p_ - 1) ? m_ % mb_ : mb_));
     assert(j >= 0);
@@ -108,7 +52,7 @@ double* Matrix::elm(const unsigned int &ti, const unsigned int &tj,
     assert(tj >= 0);
     assert(tj < q_);
     
-    unsigned int pos = 0;
+    uint64_t pos = 0;
     
     pos += ti * (mb_ * n_);
     pos += (ti == p_ - 1) ? tj * (m_ % mb_) * nb_ : tj * mb_ * nb_;
@@ -128,9 +72,9 @@ void Matrix::file_out(const char *fname) {
     
     matf.precision(5);
     
-    for (unsigned int i = 0; i < m_; i++) {
-        for (unsigned int j = 0; j < n_; j++) {
-            unsigned int p = 0;
+    for (uint32_t i = 0; i < m_; i++) {
+        for (uint32_t j = 0; j < n_; j++) {
+            uint64_t p = 0;
 
             // (i / mb_) ti
             if ((i / mb_) != p_ - 1) {
@@ -165,7 +109,7 @@ Matrix& Matrix::operator=(const Matrix &T){
     p_ = T.p_;
     q_ = T.q_;
     
-    for (unsigned int i = 0; i < m_ * n_; i++)
+    for (uint64_t i = 0; i < m_*n_; i++)
         top_[i] = T.top_[i];
     
     return *this;
@@ -176,7 +120,7 @@ Matrix Matrix::operator+(const Matrix &T) const {
     assert(n_ == T.n_);
 
     Matrix M(m_, n_, mb_, nb_);
-    for(int i=0; i<m_*n_; ++i){
+    for (uint64_t i=0; i<m_*n_; ++i){
         M[i] = (*this)[i] + T[i];
     }
 
@@ -188,7 +132,7 @@ Matrix Matrix::operator-(const Matrix &T) const {
     assert(n_ == T.n_);
 
     Matrix M(m_, n_, mb_, nb_);
-    for(int i=0; i<m_*n_; ++i){
+    for (int i=0; i<m_*n_; ++i){
         M[i] = (*this)[i] - T[i];
     }
 
@@ -196,10 +140,10 @@ Matrix Matrix::operator-(const Matrix &T) const {
 }
 
 bool Matrix::operator==(const Matrix &T) {
-    if (m_ != T.m_ || n_ != T.n_) {
+    if(m_ != T.m_ || n_ != T.n_) {
         return false;
     }
-    for (int i = 0; i < m_ * n_; i++) {
+    for (uint64_t i = 0; i < m_*n_; i++) {
         if (top_[i] != T.top_[i]){
             return false;
         }
@@ -207,9 +151,9 @@ bool Matrix::operator==(const Matrix &T) {
     return true;
 }
 
-double &Matrix::operator[](const unsigned int &i) const {
+double &Matrix::operator[](const uint64_t &i) const {
     assert(i >= 0);
-    assert(i < m_ * n_);
+    assert(i < m_*n_);
     
     return top_[i];
 }
@@ -221,7 +165,7 @@ double &Matrix::operator[](const unsigned int &i) const {
  * @param j column index
  */
 
-double &Matrix::operator()(const unsigned int &i, const unsigned int &j)
+double &Matrix::operator()(const uint32_t &i, const uint32_t &j)
 const {
     assert(i >= 0);
     assert(i < m_);
@@ -229,10 +173,10 @@ const {
     assert(j < n_);
 
 
-    const unsigned int ti = i / mb_;
-    const unsigned int tj = j / nb_;
-    const unsigned int tp = i % mb_;
-    const unsigned int tq = j % nb_;
+    const uint32_t ti = i / mb_;
+    const uint32_t tj = j / nb_;
+    const uint32_t tp = i % mb_;
+    const uint32_t tq = j % nb_;
 
     //間違っている ti, tj の位置を考慮しないといけない
     return top_[ (mb_*n_)*ti + tp + (mb_*nb_)*tj + (mb_*tq)];
@@ -280,16 +224,16 @@ const {
 
 std::ostream &operator<<(std::ostream &os, const Matrix &ma) {
     
-    unsigned int m_ = ma.m();
-    unsigned int n_ = ma.n();
-    unsigned int mb_ = ma.mb();
-    unsigned int nb_ = ma.nb();
-    unsigned int p_ = ma.p();
-    unsigned int q_ = ma.q();
+    uint32_t m_ = ma.m();
+    uint32_t n_ = ma.n();
+    uint32_t mb_ = ma.mb();
+    uint32_t nb_ = ma.nb();
+    uint32_t p_ = ma.p();
+    uint32_t q_ = ma.q();
     
-    for (unsigned int i = 0; i < m_; i++) {
-        for (unsigned int j = 0; j < n_; j++) {
-            unsigned int p = 0;
+    for (uint32_t i = 0; i < m_; i++) {
+        for (uint32_t j = 0; j < n_; j++) {
+            uint32_t p = 0;
 
             // (i / mb_) ti
             if ((i / mb_) != p_ - 1) {
@@ -315,6 +259,6 @@ std::ostream &operator<<(std::ostream &os, const Matrix &ma) {
 }
 
 void Matrix::zero() {
-    for (unsigned int i = 0; i < m_ * n_; ++i)
+    for (uint64_t i = 0; i < m_*n_; ++i)
         top_[i] = 0.0;
 }
