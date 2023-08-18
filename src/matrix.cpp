@@ -227,20 +227,19 @@ T &Matrix<T>::operator()(const uint32_t &i, const uint32_t &j) const {
     return top_[ (mb_*n_)*ti + tp + (mb_*nb_)*tj + (mb_*tq)];
 }
 
-/*
-template<typename T>
-std::ostream &operator<<(std::ostream &os, const Matrix<T> &ma) {
-    
+template<>
+std::ostream &operator<< (std::ostream &os, const Matrix<float> &ma) {
+
     uint32_t m_ = ma.m();
     uint32_t n_ = ma.n();
     uint32_t mb_ = ma.mb();
     uint32_t nb_ = ma.nb();
     uint32_t p_ = ma.p();
     uint32_t q_ = ma.q();
-    
+
     for (uint32_t i = 0; i < m_; i++) {
         for (uint32_t j = 0; j < n_; j++) {
-            uint32_t p = 0;
+            uint64_t p = 0;
 
             // (i / mb_) ti
             if ((i / mb_) != p_ - 1) {
@@ -264,7 +263,117 @@ std::ostream &operator<<(std::ostream &os, const Matrix<T> &ma) {
 
     return os;
 }
-*/
+
+template<>
+std::ostream &operator<< (std::ostream &os, const Matrix<double> &ma) {
+
+    uint32_t m_ = ma.m();
+    uint32_t n_ = ma.n();
+    uint32_t mb_ = ma.mb();
+    uint32_t nb_ = ma.nb();
+    uint32_t p_ = ma.p();
+    uint32_t q_ = ma.q();
+
+    for (uint32_t i = 0; i < m_; i++) {
+        for (uint32_t j = 0; j < n_; j++) {
+            uint64_t p = 0;
+
+            // (i / mb_) ti
+            if ((i / mb_) != p_ - 1) {
+                p += (i / mb_) * mb_ * n_;  // tiの場所
+                p += (j / nb_) * mb_ * nb_; // tjの場所
+
+                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
+            } else {
+                // ここで最終行の時と差別化
+                p += (p_ - 1) * mb_ * n_; // tiの場所
+                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
+                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
+                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
+                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
+            }
+
+            os << ma[p] << " ";
+        }
+        os << std::endl;
+    }
+
+    return os;
+}
+
+template<>
+std::ostream &operator<< (std::ostream &os, const Matrix<std::complex<float>> &ma) {
+
+    uint32_t m_ = ma.m();
+    uint32_t n_ = ma.n();
+    uint32_t mb_ = ma.mb();
+    uint32_t nb_ = ma.nb();
+    uint32_t p_ = ma.p();
+    uint32_t q_ = ma.q();
+
+    for (uint32_t i = 0; i < m_; i++) {
+        for (uint32_t j = 0; j < n_; j++) {
+            uint64_t p = 0;
+
+            // (i / mb_) ti
+            if ((i / mb_) != p_ - 1) {
+                p += (i / mb_) * mb_ * n_;  // tiの場所
+                p += (j / nb_) * mb_ * nb_; // tjの場所
+
+                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
+            } else {
+                // ここで最終行の時と差別化
+                p += (p_ - 1) * mb_ * n_; // tiの場所
+                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
+                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
+                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
+                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
+            }
+
+            os << ma[p] << " ";
+        }
+        os << std::endl;
+    }
+
+    return os;
+}
+
+template<>
+std::ostream &operator<< (std::ostream &os, const Matrix<std::complex<double>> &ma) {
+
+    uint32_t m_ = ma.m();
+    uint32_t n_ = ma.n();
+    uint32_t mb_ = ma.mb();
+    uint32_t nb_ = ma.nb();
+    uint32_t p_ = ma.p();
+    uint32_t q_ = ma.q();
+
+    for (uint32_t i = 0; i < m_; i++) {
+        for (uint32_t j = 0; j < n_; j++) {
+            uint64_t p = 0;
+
+            // (i / mb_) ti
+            if ((i / mb_) != p_ - 1) {
+                p += (i / mb_) * mb_ * n_;  // tiの場所
+                p += (j / nb_) * mb_ * nb_; // tjの場所
+
+                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
+            } else {
+                // ここで最終行の時と差別化
+                p += (p_ - 1) * mb_ * n_; // tiの場所
+                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
+                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
+                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
+                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
+            }
+
+            os << ma[p] << " ";
+        }
+        os << std::endl;
+    }
+
+    return os;
+}
 
 template<typename T>
 void Matrix<T>::zero() {
