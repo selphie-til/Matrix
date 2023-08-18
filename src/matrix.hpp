@@ -4,6 +4,12 @@
 #include <iostream>
 #include <cstdint>
 
+template<typename T>
+class Matrix;
+
+template<typename T>
+std::ostream& operator<< ( std::ostream& os, Matrix<T> const &ma);
+
 template <typename T>
 class Matrix {
     
@@ -75,7 +81,5 @@ public:
     T &operator[](const uint64_t &i) const;
     T &operator()(const uint32_t &i, const uint32_t &j) const;
 
-    /*
-    friend std::ostream &operator<<(std::ostream &os, const Matrix<T> &ma);
-     */
+    friend std::ostream& operator<< <>(std::ostream &os, const Matrix<T> &ma);
 };
