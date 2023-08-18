@@ -16,12 +16,12 @@ int main(const int argc, const char* argv[])
 	return -1;
     }
     
-    const int M = atoi(argv[1]);
-    const int N = atoi(argv[2]);
-    const int ts = atoi(argv[3]);
+    const uint32_t M = atoi(argv[1]);
+    const uint32_t N = atoi(argv[2]);
+    const uint32_t ts = atoi(argv[3]);
     
-    Matrix *A = new Matrix(M,N,ts);
-    Matrix *B = new Matrix(M,N,ts);
+    auto *A = new Matrix<double>(M,N,ts);
+    auto *B = new Matrix<double>(M,N,ts);
     
     A->gen_rnd_elm();
     *B = *A;
@@ -34,10 +34,10 @@ int main(const int argc, const char* argv[])
     
     cout << setprecision(5);
     
-    cout << *A << endl;
+    //cout << *A << endl;
     
     for(int i=0; i<M*N; i++){
-	cout << (*A)[i] << endl;;
+        cout << (*A)[i] << endl;;
     }
     char filename[] = "test.dat";
     A->file_out(filename);
