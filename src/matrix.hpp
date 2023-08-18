@@ -75,5 +75,7 @@ public:
     T &operator[](const uint64_t &i) const;
     T &operator()(const uint32_t &i, const uint32_t &j) const;
 
-    friend std::ostream &operator<<(std::ostream &os, const Matrix &ma);
+    /*
+    friend std::ostream &operator<<(std::ostream &os, const Matrix<T> &ma);
+     */
 };

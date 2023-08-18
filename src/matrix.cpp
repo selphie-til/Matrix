@@ -227,6 +227,7 @@ T &Matrix<T>::operator()(const uint32_t &i, const uint32_t &j) const {
     return top_[ (mb_*n_)*ti + tp + (mb_*nb_)*tj + (mb_*tq)];
 }
 
+/*
 template<typename T>
 std::ostream &operator<<(std::ostream &os, const Matrix<T> &ma) {
     
@@ -263,6 +264,7 @@ std::ostream &operator<<(std::ostream &os, const Matrix<T> &ma) {
 
     return os;
 }
+*/
 
 template<typename T>
 void Matrix<T>::zero() {
