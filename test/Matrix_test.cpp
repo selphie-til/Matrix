@@ -34,7 +34,7 @@ int main(const int argc, const char* argv[])
     
     cout << setprecision(5);
     
-    //cout << *A << endl;
+    cout << *A << endl;
     
     for(int i=0; i<M*N; i++){
         cout << (*A)[i] << endl;;
