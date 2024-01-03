@@ -4,143 +4,97 @@
 #include <cstdlib>
 #include <fstream>
 #include <random>
-#include <cstring>
 #include <complex>
 
 #include "matrix.hpp"
 
 template<typename T>
 Matrix<T>::~Matrix() {
-    
-    delete[] top_;
-    top_ = nullptr;
+    this->top_ = nullptr;
 }
 
-template<>
-void Matrix<float>::gen_rnd_elm() {
-
+template<typename T>
+void Matrix<T>::gen_rnd_elm() {
     // 乱数生成器
     std::random_device rdev;
     // ランダムなシードの設定
     std::mt19937 engine(rdev());
-    std::uniform_real_distribution<float> dist(0.0, 1.0);
+    std::uniform_real_distribution<T> dist(0.0, 1.0);
 
     for (uint64_t i = 0; i < m_*n_; ++i) {
-        top_[i] = dist(engine);
-    }
-}
-
-template<>
-void Matrix<double>::gen_rnd_elm() {
-    
-    // 乱数生成器
-    std::random_device rdev;
-    // ランダムなシードの設定
-    std::mt19937 engine(rdev());
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
-    
-    for (uint64_t i = 0; i < m_*n_; ++i) {
-        top_[i] = dist(engine);
-    }
-}
-
-template<>
-void Matrix<std::complex<float>>::gen_rnd_elm() {
-
-    // 乱数生成器
-    std::random_device rdev;
-    // ランダムなシードの設定
-    std::mt19937 engine(rdev());
-    std::uniform_real_distribution<float> dist(0.0, 1.0);
-
-    for (uint64_t i = 0; i < m_*n_; ++i) {
-        top_[i] = std::complex<float> {dist(engine), dist(engine)};
-    }
-}
-
-template<>
-void Matrix<std::complex<double>>::gen_rnd_elm() {
-
-    // 乱数生成器
-    std::random_device rdev;
-    // ランダムなシードの設定
-    std::mt19937 engine(rdev());
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
-
-    for (uint64_t i = 0; i < m_*n_; ++i) {
-        top_[i] = std::complex<double> {dist(engine), dist(engine)};
+        ((this->top_).get())[i] = dist(engine);
     }
 }
 
 template<typename T>
 T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj) const {
     assert(ti >= 0);
-    assert(ti < p_);
+    assert(ti < (this->p_));
     assert(tj >= 0);
-    assert(tj < q_);
-    
+    assert(tj < (this->q_));
+
     uint32_t pos = 0;
-    
-    pos += ti * (mb_ * n_);
-    pos += (ti == p_ - 1) ? tj * (m_ % mb_) * nb_ : tj * mb_ * nb_;
-    
-    return &top_[pos];
+
+    pos += ti * ((this->mb_) * (this->n_));
+    pos += (ti == (this->p_ - 1)) ? tj * (this->m_ % this->mb_) * (this->nb_) : tj * this->mb_ * this->nb_;
+
+    return &(top_.get()[pos]);
 }
 
 template<typename T>
 T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj,
                   const uint32_t &i, const uint32_t &j) const {
     assert(i >= 0);
-    assert(i < (ti == (p_ - 1) ? m_ % mb_ : mb_));
+    assert(i < (ti == (this->p_ - 1) ? (this->m_) % (this->mb_) : this->mb_));
     assert(j >= 0);
-    assert(j < (tj == (q_ - 1) ? n_ % nb_ : nb_));
-    
+    assert(j < (tj == (this->q_ - 1) ? (this->n_) % (this->nb_) : this->nb_));
+
     assert(ti >= 0);
-    assert(ti < p_);
+    assert(ti < this->p_);
     assert(tj >= 0);
-    assert(tj < q_);
-    
+    assert(tj < this->q_);
+
     uint64_t pos = 0;
-    
-    pos += ti * (mb_ * n_);
-    pos += (ti == p_ - 1) ? tj * (m_ % mb_) * nb_ : tj * mb_ * nb_;
+
+    pos += ti * (this->mb_ * this->n_);
+    pos += (ti == (this->p_ - 1)) ? tj * (this->m_ % this->mb_) * this->nb_ : tj * this->mb_ * this->nb_;
     pos += i;
-    pos += (ti == p_ - 1) ? j * (m_ % mb_) : j * mb_;
-    
-    return &top_[pos];
+    pos += (ti == (this->p_ - 1)) ? j * (this->m_ % this->mb_) : j * this->mb_;
+
+    return &(top_.get()[pos]);
 }
 
 template<typename T>
 void Matrix<T>::file_out(const char *fname) {
-    
+
     std::ofstream matf(fname);
     if (!matf) {
         std::cerr << "Unable to open " << fname << std::endl;
         exit(1);
     }
-    
+
     matf.precision(5);
-    
-    for (uint32_t i = 0; i < m_; i++) {
-        for (uint32_t j = 0; j < n_; j++) {
+
+    for (uint32_t i = 0; i < this->m_; i++) {
+        for (uint32_t j = 0; j < this->n_; j++) {
             uint64_t p = 0;
 
             // (i / mb_) ti
-            if ((i / mb_) != p_ - 1) {
-                p += (i / mb_) * mb_ * n_;  // tiの場所
-                p += (j / nb_) * mb_ * nb_; // tjの場所
+            if ((i / this->mb_) != this->p_ - 1) {
+                p += (i / this->mb_) * this->mb_ * this->n_;  // tiの場所
+                p += (j / this->nb_) * this->mb_ * this->nb_; // tjの場所
 
-                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
+                p += (j % this->nb_) * this->mb_ + (i % this->mb_); // i,jの場所
             } else {
                 // ここで最終行の時と差別化
-                p += (p_ - 1) * mb_ * n_; // tiの場所
-                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
-                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
-                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
-                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
+                p += (this->p_ - 1) * this->mb_ * this->n_; // tiの場所
+                p += ((this->m_ % this->mb_) == 0) ? (j / this->nb_) * this->mb_ * this->nb_
+                                     : (j / this->nb_) * (this->m_ % this->mb_) * this->nb_; // tjの場所
+                p += ((this->m_ % this->mb_) == 0) ? (j % this->nb_) * this->mb_ + (i % this->mb_)
+                                     : (j % this->nb_) * (this->m_ % this->mb_) + (i % this->mb_);
             }
 
-            matf << top_[p] << " ";
+            matf << (this->top_)[p] << " ";
         }
         matf << std::endl;
     }
@@ -149,20 +103,34 @@ void Matrix<T>::file_out(const char *fname) {
 
 template<typename T>
 Matrix<T>& Matrix<T>::operator=(const Matrix<T> &M){
-    assert(m_ == M.m_);
-    assert(n_ == M.n_);
+    assert(this->m_ == M.m_);
+    assert(this->n_ == M.n_);
 
-    m_ = M.m_;
-    n_ = M.n_;
-    mb_ = M.mb_;
-    nb_ = M.nb_;
-    p_ = M.p_;
-    q_ = M.q_;
-    
-    for (uint64_t i = 0; i < m_*n_; i++)
-        top_[i] = M.top_[i];
-    
+    this->m_ = M.m_;
+    this->n_ = M.n_;
+    this->mb_ = M.mb_;
+    this->nb_ = M.nb_;
+    this->p_ = M.p_;
+    this->q_ = M.q_;
+
+    for (uint64_t i = 0; i < (this->m_)*(this->n_); i++)
+        (this->top_).get()[i] = (M.top_).get()[i];
+
     return *this;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::addElements(const Matrix<T> &M) const {
+    assert(this->m_ == M.m_);
+    assert(this->n_ == M.n_);
+
+    Matrix N(this->m_, this->n_, this->mb_, this->nb_);
+    uint64_t totalElements = (this->m_) * (this->n_);
+    for( uint64_t i=0; i<totalElements; ++i){
+        N[i] = (*this)[i] + M[i];
+    }
+
+    return N;
 }
 
 template<typename T>
@@ -170,9 +138,18 @@ Matrix<T> Matrix<T>::operator+(const Matrix<T> &M) const {
     assert(m_ == M.m_);
     assert(n_ == M.n_);
 
-    Matrix N(m_, n_, mb_, nb_);
-    for (uint64_t i=0; i<m_*n_; ++i){
-        N[i] = (*this)[i] + M[i];
+    return this->addElements(M);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::minusElements(const Matrix<T> &M) const{
+    assert(this->m_ == M.m_);
+    assert(this->n_ == M.n_);
+
+    Matrix N( this->m_, this->n_, this->mb_, this->nb_);
+    uint64_t totalElements = (this->m_) * (this->n_);
+    for( uint64_t i=0; i<totalElements; ++i){
+        N[i] = (*this)[i] - M[i];
     }
 
     return N;
@@ -183,12 +160,7 @@ Matrix<T> Matrix<T>::operator-(const Matrix<T> &M) const {
     assert(m_ == M.m_);
     assert(n_ == M.n_);
 
-    Matrix N(m_, n_, mb_, nb_);
-    for (uint64_t i=0; i<m_*n_; ++i){
-        N[i] = (*this)[i] - M[i];
-    }
-
-    return N;
+    return this->minusElements(M);
 }
 
 template<typename T>
@@ -207,182 +179,32 @@ bool Matrix<T>::operator==(const Matrix<T> &M) {
 template<typename T>
 T &Matrix<T>::operator[](const uint64_t &i) const {
     assert(i >= 0);
-    assert(i < m_*n_);
-    
+    assert(i < (this->m_)*(this->n_));
+
     return top_[i];
 }
 
 template<typename T>
 T &Matrix<T>::operator()(const uint32_t &i, const uint32_t &j) const {
     assert(i >= 0);
-    assert(i < m_);
+    assert(i < (this->m_));
     assert(j >= 0);
-    assert(j < n_);
+    assert(j < (this->n_));
 
-    const uint32_t ti = i / mb_;
-    const uint32_t tj = j / nb_;
-    const uint32_t tp = i % mb_;
-    const uint32_t tq = j % nb_;
+    const uint32_t ti = i / this->mb_;
+    const uint32_t tj = j / this->nb_;
+    const uint32_t tp = i % this->mb_;
+    const uint32_t tq = j % this->nb_;
 
-    return top_[ (mb_*n_)*ti + tp + (mb_*nb_)*tj + (mb_*tq)];
-}
-
-template<>
-std::ostream &operator<< (std::ostream &os, const Matrix<float> &ma) {
-
-    uint32_t m_ = ma.m();
-    uint32_t n_ = ma.n();
-    uint32_t mb_ = ma.mb();
-    uint32_t nb_ = ma.nb();
-    uint32_t p_ = ma.p();
-    uint32_t q_ = ma.q();
-
-    for (uint32_t i = 0; i < m_; i++) {
-        for (uint32_t j = 0; j < n_; j++) {
-            uint64_t p = 0;
-
-            // (i / mb_) ti
-            if ((i / mb_) != p_ - 1) {
-                p += (i / mb_) * mb_ * n_;  // tiの場所
-                p += (j / nb_) * mb_ * nb_; // tjの場所
-
-                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
-            } else {
-                // ここで最終行の時と差別化
-                p += (p_ - 1) * mb_ * n_; // tiの場所
-                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
-                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
-                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
-                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
-            }
-
-            os << ma[p] << " ";
-        }
-        os << std::endl;
-    }
-
-    return os;
-}
-
-template<>
-std::ostream &operator<< (std::ostream &os, const Matrix<double> &ma) {
-
-    uint32_t m_ = ma.m();
-    uint32_t n_ = ma.n();
-    uint32_t mb_ = ma.mb();
-    uint32_t nb_ = ma.nb();
-    uint32_t p_ = ma.p();
-    uint32_t q_ = ma.q();
-
-    for (uint32_t i = 0; i < m_; i++) {
-        for (uint32_t j = 0; j < n_; j++) {
-            uint64_t p = 0;
-
-            // (i / mb_) ti
-            if ((i / mb_) != p_ - 1) {
-                p += (i / mb_) * mb_ * n_;  // tiの場所
-                p += (j / nb_) * mb_ * nb_; // tjの場所
-
-                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
-            } else {
-                // ここで最終行の時と差別化
-                p += (p_ - 1) * mb_ * n_; // tiの場所
-                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
-                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
-                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
-                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
-            }
-
-            os << ma[p] << " ";
-        }
-        os << std::endl;
-    }
-
-    return os;
-}
-
-template<>
-std::ostream &operator<< (std::ostream &os, const Matrix<std::complex<float>> &ma) {
-
-    uint32_t m_ = ma.m();
-    uint32_t n_ = ma.n();
-    uint32_t mb_ = ma.mb();
-    uint32_t nb_ = ma.nb();
-    uint32_t p_ = ma.p();
-    uint32_t q_ = ma.q();
-
-    for (uint32_t i = 0; i < m_; i++) {
-        for (uint32_t j = 0; j < n_; j++) {
-            uint64_t p = 0;
-
-            // (i / mb_) ti
-            if ((i / mb_) != p_ - 1) {
-                p += (i / mb_) * mb_ * n_;  // tiの場所
-                p += (j / nb_) * mb_ * nb_; // tjの場所
-
-                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
-            } else {
-                // ここで最終行の時と差別化
-                p += (p_ - 1) * mb_ * n_; // tiの場所
-                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
-                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
-                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
-                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
-            }
-
-            os << ma[p] << " ";
-        }
-        os << std::endl;
-    }
-
-    return os;
-}
-
-template<>
-std::ostream &operator<< (std::ostream &os, const Matrix<std::complex<double>> &ma) {
-
-    uint32_t m_ = ma.m();
-    uint32_t n_ = ma.n();
-    uint32_t mb_ = ma.mb();
-    uint32_t nb_ = ma.nb();
-    uint32_t p_ = ma.p();
-    uint32_t q_ = ma.q();
-
-    for (uint32_t i = 0; i < m_; i++) {
-        for (uint32_t j = 0; j < n_; j++) {
-            uint64_t p = 0;
-
-            // (i / mb_) ti
-            if ((i / mb_) != p_ - 1) {
-                p += (i / mb_) * mb_ * n_;  // tiの場所
-                p += (j / nb_) * mb_ * nb_; // tjの場所
-
-                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
-            } else {
-                // ここで最終行の時と差別化
-                p += (p_ - 1) * mb_ * n_; // tiの場所
-                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
-                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
-                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
-                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
-            }
-
-            os << ma[p] << " ";
-        }
-        os << std::endl;
-    }
-
-    return os;
+    return top_[ (this->mb_*this->n_)*ti + tp + (this->mb_*this->nb_)*tj + (this->mb_*tq)];
 }
 
 template<typename T>
 void Matrix<T>::zero() {
 
-    std::memset( top_, 0, sizeof(T)*m_*n_);
+    std::fill(top_.get(), top_.get() + (this->m_) + (this->n_), 0);
 
 }
 
 template class Matrix<float>;
 template class Matrix<double>;
-template class Matrix<std::complex<float>>;
-template class Matrix<std::complex<double>>;
