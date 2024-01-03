@@ -96,5 +96,37 @@ public:
     T &operator[](const uint64_t &i) const;
     T &operator()(const uint32_t &i, const uint32_t &j) const;
 
-    friend std::ostream& operator<< <>(std::ostream &os, const Matrix<T> &ma);
+    friend std::ostream& operator<< (std::ostream &os, const Matrix<T> &ma){
+        uint32_t m = ma.m();
+        uint32_t n = ma.n();
+        uint32_t mb = ma.mb();
+        uint32_t nb = ma.nb();
+        uint32_t p = ma.p();
+
+        for (uint32_t i = 0; i < m; i++) {
+            for (uint32_t j = 0; j < n; j++) {
+                uint64_t pos = 0;
+
+                // (i / mb_) ti
+                if ((i / mb) != p - 1) {
+                    pos += (i / mb) * mb * n;  // tiの場所
+                    pos += (j / nb) * mb * nb; // tjの場所
+
+                    pos += (j % nb) * mb + (i % mb); // i,jの場所
+                } else {
+                    // ここで最終行の時と差別化
+                    pos += (p - 1) * mb * n; // tiの場所
+                    pos += (m % mb == 0) ? (j / nb) * mb * nb
+                                         : (j / nb) * (m % mb) * nb; // tjの場所
+                    pos += (m % mb == 0) ? (j % nb) * mb + (i % mb)
+                                         : (j % nb) * (m % mb) + (i % mb);
+                }
+
+                os << ma[pos] << " ";
+            }
+            os << std::endl;
+        }
+
+        return os;
+    }
 };

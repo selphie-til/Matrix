@@ -200,42 +200,6 @@ T &Matrix<T>::operator()(const uint32_t &i, const uint32_t &j) const {
 }
 
 template<typename T>
-std::ostream &operator<< (std::ostream &os, const Matrix<T> &ma) {
-
-    uint32_t m_ = ma.m();
-    uint32_t n_ = ma.n();
-    uint32_t mb_ = ma.mb();
-    uint32_t nb_ = ma.nb();
-    uint32_t p_ = ma.p();
-
-    for (uint32_t i = 0; i < m_; i++) {
-        for (uint32_t j = 0; j < n_; j++) {
-            uint64_t p = 0;
-
-            // (i / mb_) ti
-            if ((i / mb_) != p_ - 1) {
-                p += (i / mb_) * mb_ * n_;  // tiの場所
-                p += (j / nb_) * mb_ * nb_; // tjの場所
-
-                p += (j % nb_) * mb_ + (i % mb_); // i,jの場所
-            } else {
-                // ここで最終行の時と差別化
-                p += (p_ - 1) * mb_ * n_; // tiの場所
-                p += (m_ % mb_ == 0) ? (j / nb_) * mb_ * nb_
-                                     : (j / nb_) * (m_ % mb_) * nb_; // tjの場所
-                p += (m_ % mb_ == 0) ? (j % nb_) * mb_ + (i % mb_)
-                                     : (j % nb_) * (m_ % mb_) + (i % mb_);
-            }
-
-            os << ma[p] << " ";
-        }
-        os << std::endl;
-    }
-
-    return os;
-}
-
-template<typename T>
 void Matrix<T>::zero() {
 
     std::fill(top_.get(), top_.get() + (this->m_) + (this->n_), 0);
