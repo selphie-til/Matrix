@@ -18,10 +18,10 @@ protected:
     std::unique_ptr<T[]> top_;     // pointer to the matrix
     uint32_t m_;  // number of lows of the matrix or lda
     uint32_t n_;  // number of columns of the matrix
-    uint32_t mb_{}; // number of lows of the tile
-    uint32_t nb_{}; // number of columns of the tile
-    uint32_t p_{};  // number of low tiles
-    uint32_t q_{};  // number of column tiles
+    uint32_t mb_; // number of lows of the tile
+    uint32_t nb_; // number of columns of the tile
+    uint32_t p_;  // number of low tiles
+    uint32_t q_;  // number of column tiles
 
 public:
     // Default constructor
@@ -47,9 +47,19 @@ public:
     // Destructor
     ~Matrix();
 
+    // CopyConstructor
+    Matrix(const Matrix& M):m_{M.m_}, n_{M.n_}, mb_{M.mb_}, nb_{M.nb_},
+                            p_{M.p_}, q_{M.q_}, top_{std::make_unique<T[]>(M.m_*M.n_)}
+    {
+        if( M.top_ != nullptr) {
+            std::copy((M.top_).get(), (M.top_).get() + M.m_ * M.n_, top_.get());
+        }
+    }
+
     // MoveConstructor
-    Matrix(Matrix<T>&& M) noexcept: m_(M.m_), n_(M.n_), mb_(M.mb_),
-                                    p_(M.p_), q_(M.q_), top_(std::move(M.top_)){
+    Matrix(Matrix<T>&& M) noexcept: m_{M.m_}, n_{M.n_}, mb_{M.mb_}, nb_{M.nb_},
+                                    p_{M.p_}, q_{M.q_}, top_{std::move(M.top_)}
+    {
         M.m_ = 0;
         M.n_ = 0;
         M.mb_ = 0;
