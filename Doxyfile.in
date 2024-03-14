@@ -1,0 +1,6 @@
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = "Tiled_Matrix"
+PROJECT_NUMBER         = 1.0
+OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/doc/doxygen
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/src
+RECURSIVE              = YES
