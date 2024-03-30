@@ -5,6 +5,29 @@
 #include <cstdint>
 #include <memory>
 
+/**
+ * @enum Ordering
+ * @brief タイル化された行列とその行列上のタイルのストレージ順序を表す列挙体。
+ *
+ * @var Ordering::TileMatrixRowMajorTileRowMajor
+ * タイル行列自身が行方向優先であり、各タイル内の要素も行方向優先で格納されています。
+ *
+ * @var Ordering::TileMatrixRowMajorTileColumnMajor
+ * タイル行列自身が行方向優先で、各タイル内の要素は列方向優先で格納されています。
+ *
+ * @var Ordering::TileMatrixColumnMajorTileRowMajor
+ * タイル行列自身が列方向優先で、各タイル内の要素は行方向優先で格納されています。
+ *
+ * @var Ordering::TileMatrixColumnMajorTileColumnMajor
+ * タイル行列自身も各タイル内も列方向優先で格納されています。
+ */
+enum class Ordering :unsigned short{
+    TileMatrixRowMajorTileRowMajor,
+    TileMatrixRowMajorTileColumnMajor,
+    TileMatrixColumnMajorTileRowMajor,
+    TileMatrixColumnMajorTileColumnMajor,
+};
+
 template<typename T>
 class Matrix;
 
@@ -49,32 +72,48 @@ protected:
      */
     uint32_t q_;  // number of column tiles
 
+    /**
+     * @brief オーダリングオブジェクト
+     *
+     * このメンバは、タイル行列の配置順序を管理します。
+     * タイル行列、タイル内のrow-majorまたはcolumn-majorのいずれかになります。
+     */
+    Ordering ordering_;
+
 public:
     /**
      * @brief デフォルトコンストラクタ。
      */
     Matrix():m_{0}, n_{0},
              mb_{0}, nb_{0},
-             p_{0}, q_{0}, top_{nullptr} {};
+             p_{0}, q_{0}, top_{nullptr},
+             ordering_{Ordering::TileMatrixColumnMajorTileColumnMajor}
+             {};
     /**
      * @brief 行列のサイズを指定するコンストラクタ。
      * @param m 行数
      * @param n 列数
      */
-    Matrix(const uint32_t &m, const uint32_t &n):m_{m}, n_{n},
-                                                 mb_{m}, nb_{n},
-                                                 p_{1}, q_{1}, top_{std::make_unique<T[]>(m*n)} {};
+    Matrix(const uint32_t &m, const uint32_t &n,
+           const Ordering ordering=Ordering::TileMatrixColumnMajorTileColumnMajor)
+           :m_{m}, n_{n},
+            mb_{m}, nb_{n},
+            p_{1}, q_{1}, top_{std::make_unique<T[]>(m*n)},
+            ordering_{ordering} {};
     /**
      * @brief 行列のサイズとタイルのサイズを指定するコンストラクタ。
      * @param m 行数
      * @param n 列数
      * @param ts タイルのサイズ
      */
-    Matrix(const uint32_t &m, const uint32_t &n, const uint32_t &ts):m_{m}, n_{n},
-                                                                     mb_{ts}, nb_{ts},
-                                                                     p_{(m % ts == 0) ? m / ts : m / ts + 1},
-                                                                     q_{(n % ts == 0) ? n / ts : n / ts + 1},
-                                                                     top_{std::make_unique<T[]>(m*n)} {};
+    Matrix(const uint32_t &m, const uint32_t &n, const uint32_t &ts,
+           const Ordering ordering=Ordering::TileMatrixColumnMajorTileColumnMajor)
+           :m_{m}, n_{n},
+            mb_{ts}, nb_{ts},
+            p_{(m % ts == 0) ? m / ts : m / ts + 1},
+            q_{(n % ts == 0) ? n / ts : n / ts + 1},
+            top_{std::make_unique<T[]>(m*n)},
+            ordering_{ordering} {};
     /**
      * @brief  行列のサイズとタイルのサイズを指定するコンストラクタ。
      * @param m 行数
@@ -83,11 +122,14 @@ public:
      * @param nb タイルの列数
      */
     Matrix(const uint32_t &m, const uint32_t &n,
-           const uint32_t &mb, const uint32_t &nb):m_{m}, n_{n},
-                                                   mb_{mb}, nb_{nb},
-                                                   p_{(m % mb == 0) ? m / mb : m / mb + 1},
-                                                   q_{(n % nb == 0) ? n / nb : n / nb + 1},
-                                                   top_{std::make_unique<T[]>(m*n)} {};
+           const uint32_t &mb, const uint32_t &nb,
+           const Ordering ordering=Ordering::TileMatrixColumnMajorTileColumnMajor):
+            m_{m}, n_{n},
+            mb_{mb}, nb_{nb},
+            p_{(m % mb == 0) ? m / mb : m / mb + 1},
+            q_{(n % nb == 0) ? n / nb : n / nb + 1},
+            top_{std::make_unique<T[]>(m*n)},
+            ordering_{ordering} {};
 
     /**
      * @brief デストラクタ。
@@ -99,7 +141,8 @@ public:
      * @param M コピー元のMatrixオブジェクト
      */
     Matrix(const Matrix& M):m_{M.m_}, n_{M.n_}, mb_{M.mb_}, nb_{M.nb_},
-                            p_{M.p_}, q_{M.q_}, top_{std::make_unique<T[]>(M.m_*M.n_)}
+                            p_{M.p_}, q_{M.q_}, top_{std::make_unique<T[]>(M.m_*M.n_)},
+                            ordering_{M.ordering_}
     {
         if( M.top_ != nullptr) {
             std::copy((M.top_).get(), (M.top_).get() + M.m_ * M.n_, top_.get());
@@ -111,7 +154,8 @@ public:
      * @param M ムーブ元のMatrixオブジェクト
      */
     Matrix(Matrix<T>&& M) noexcept: m_{M.m_}, n_{M.n_}, mb_{M.mb_}, nb_{M.nb_},
-                                    p_{M.p_}, q_{M.q_}, top_{std::move(M.top_)}
+                                    p_{M.p_}, q_{M.q_}, top_{std::move(M.top_)},
+                                    ordering_{M.ordering_}
     {
         M.m_ = 0;
         M.n_ = 0;
@@ -245,32 +289,33 @@ public:
         uint32_t n = ma.n();
         uint32_t mb = ma.mb();
         uint32_t nb = ma.nb();
-        uint32_t p = ma.p();
 
         for (uint32_t i = 0; i < m; i++) {
             for (uint32_t j = 0; j < n; j++) {
-                uint64_t pos = 0;
 
-                // (i / mb_) ti
-                if ((i / mb) != p - 1) {
-                    pos += (i / mb) * mb * n;  // tiの場所
-                    pos += (j / nb) * mb * nb; // tjの場所
-
-                    pos += (j % nb) * mb + (i % mb); // i,jの場所
-                } else {
-                    // ここで最終行の時と差別化
-                    pos += (p - 1) * mb * n; // tiの場所
-                    pos += (m % mb == 0) ? (j / nb) * mb * nb
-                                         : (j / nb) * (m % mb) * nb; // tjの場所
-                    pos += (m % mb == 0) ? (j % nb) * mb + (i % mb)
-                                         : (j % nb) * (m % mb) + (i % mb);
-                }
-
-                os << ma[pos] << " ";
+                os << ma( i, j) << " ";
             }
             os << std::endl;
         }
 
         return os;
     }
+
+private:
+    /**
+ * @brief タイル行列から配列への変換を行う関数です。
+ *
+ * 与えられたタイル行列の座標 (`ti`, `tj`) および、その内部の座標 (`i`, `j`) を
+ * 使用して、1次元配列に対応するインデックスを計算します。タイル行列から配列への
+ * 変換は、タイル行列の配置 (Column-Major/Row-Major) とタイルの配置
+ * (Column-Major/Row-Major) の組み合わせに基づく順序付けを制御します。
+ *
+ * @param ti タイル行列の行インデックスです。
+ * @param tj タイル行列の列インデックスです。
+ * @param i  タイル内の行インデックスです。
+ * @param j  タイル内の列インデックスです。
+ * @return 計算された1次元配列のインデックスを返します。
+ */
+    uint64_t convertTileToArray(const uint32_t &ti, const uint32_t &tj,
+                                const uint32_t &i, const uint32_t &j) const;
 };

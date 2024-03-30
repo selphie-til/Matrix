@@ -60,10 +60,7 @@ T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj) const {
     assert(tj >= 0);
     assert(tj < (this->q_));
 
-    uint32_t pos = 0;
-
-    pos += ti * ((this->mb_) * (this->n_));
-    pos += (ti == (this->p_ - 1)) ? tj * (this->m_ % this->mb_) * (this->nb_) : tj * this->mb_ * this->nb_;
+    uint32_t pos = Matrix<T>::convertTileToArray(ti, tj, 0, 0);
 
     return &(top_.get()[pos]);
 }
@@ -98,12 +95,7 @@ T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj,
     assert(tj >= 0);
     assert(tj < this->q_);
 
-    uint64_t pos = 0;
-
-    pos += ti * (this->mb_ * this->n_);
-    pos += (ti == (this->p_ - 1)) ? tj * (this->m_ % this->mb_) * this->nb_ : tj * this->mb_ * this->nb_;
-    pos += i;
-    pos += (ti == (this->p_ - 1)) ? j * (this->m_ % this->mb_) : j * this->mb_;
+    uint64_t pos = Matrix<T>::convertTileToArray( ti, tj, i, j);
 
     return &(top_.get()[pos]);
 }
@@ -134,24 +126,14 @@ void Matrix<T>::file_out(const char *fname) {
 
     for (uint32_t i = 0; i < this->m_; i++) {
         for (uint32_t j = 0; j < this->n_; j++) {
-            uint64_t p = 0;
+            const uint32_t ti = i / this->mb_;
+            const uint32_t tj = j / this->nb_;
+            const uint32_t tp = i % this->mb_;
+            const uint32_t tq = j % this->nb_;
 
-            // (i / mb_) ti
-            if ((i / this->mb_) != this->p_ - 1) {
-                p += (i / this->mb_) * this->mb_ * this->n_;  // tiの場所
-                p += (j / this->nb_) * this->mb_ * this->nb_; // tjの場所
+            uint64_t pos = Matrix<T>::convertTileToArray( ti, tj, tp, tq);
 
-                p += (j % this->nb_) * this->mb_ + (i % this->mb_); // i,jの場所
-            } else {
-                // ここで最終行の時と差別化
-                p += (this->p_ - 1) * this->mb_ * this->n_; // tiの場所
-                p += ((this->m_ % this->mb_) == 0) ? (j / this->nb_) * this->mb_ * this->nb_
-                                     : (j / this->nb_) * (this->m_ % this->mb_) * this->nb_; // tjの場所
-                p += ((this->m_ % this->mb_) == 0) ? (j % this->nb_) * this->mb_ + (i % this->mb_)
-                                     : (j % this->nb_) * (this->m_ % this->mb_) + (i % this->mb_);
-            }
-
-            matf << (this->top_)[p] << " ";
+            matf << (this->top_)[pos] << " ";
         }
         matf << std::endl;
     }
@@ -343,7 +325,9 @@ T &Matrix<T>::operator()(const uint32_t &i, const uint32_t &j) const {
     const uint32_t tp = i % this->mb_;
     const uint32_t tq = j % this->nb_;
 
-    return top_[ (this->mb_*this->n_)*ti + tp + (this->mb_*this->nb_)*tj + (this->mb_*tq)];
+    uint64_t pos = Matrix<T>::convertTileToArray( ti, tj, tp, tq);
+
+    return top_[ pos ];
 }
 
 /**
@@ -359,6 +343,51 @@ void Matrix<T>::zero() {
 
     std::fill(top_.get(), top_.get() + (this->m_) + (this->n_), 0);
 
+}
+
+/**
+ * @brief タイル行列から配列への変換を行う
+ *
+ * タイル行列の座標 (ti, tj) および、タイル内の座標 (i, j) から、配列のインデックスを計算します。
+ * また、タイル行列の配置（Column-Major/Row-Major）および、タイル内の配置（Column-Major/Row-Major）に基づいた順序付けを制御します。
+ *
+ * @tparam T 値の型
+ * @param ti タイル行列の行番号
+ * @param tj タイル行列の列番号
+ * @param i タイル内の行番号
+ * @param j タイル内の列番号
+ * @return 生成された配列のインデックス
+ */
+template<typename T>
+uint64_t Matrix<T>::convertTileToArray(const uint32_t &ti, const uint32_t &tj, const uint32_t &i, const uint32_t &j) const{
+    uint64_t index = {0};
+    switch ( static_cast<unsigned short>(ordering_) ) {
+        case static_cast<unsigned short>(Ordering::TileMatrixColumnMajorTileColumnMajor):
+            index += ((tj != (this->q_ - 1)) || (this->q_ == 1)) ? ti * (this->mb_) * (this->nb_) : ti * (this->nb_) * (this->n_ % this->nb_);
+            index += tj * (this->m_) * (this->nb_);
+            index += ((ti != (this->p_ - 1)) || (this->p_ == 1)) ? j * (this->mb_) : j * (this->m_ % this->mb_);
+            index += i;
+            break;
+        case static_cast<unsigned short>(Ordering::TileMatrixRowMajorTileColumnMajor):
+            index += ti * (this->mb_ * this->n_);
+            index += ((ti != (this->p_ - 1)) || (this->p_ == 1)) ? tj * (this->mb_ * this->nb_) : tj * (this->m_ % this->mb_) * this->nb_;
+            index += ((ti != (this->p_ - 1)) || (this->p_ == 1)) ? j * (this->mb_) : j * (this->m_ % this->mb_);
+            index += i;
+            break;
+        case static_cast<unsigned short>(Ordering::TileMatrixColumnMajorTileRowMajor):
+            index += ((tj != (this->q_ - 1)) || (this->q_ == 1)) ? ti * (this->mb_) * (this->nb_) : ti * (this->nb_) * (this->n_ % this->nb_);
+            index += tj * (this->m_) * (this->nb_);
+            index += ((tj != (this->q_ - 1)) || (this->q_ == 1)) ? i * (this->nb_) : i * (this->n_ % this->nb_);
+            index += j;
+        case static_cast<unsigned short>(Ordering::TileMatrixRowMajorTileRowMajor):
+            index += ti * (this->mb_ * this->n_);
+            index += ((ti != (this->p_ - 1)) || (this->p_ == 1)) ? tj * (this->mb_ * this->nb_) : tj * (this->m_ % this->mb_) * this->nb_;
+            index += ((tj != (this->q_ - 1)) || (this->q_ == 1)) ? i * (this->nb_) : i * (this->n_ % this->nb_);
+            index += j;
+        default:
+            break;
+    }
+    return index;
 }
 
 //! フロート値用のMatrix特化クラス
