@@ -363,27 +363,29 @@ uint64_t Matrix<T>::convertTileToArray(const uint32_t &ti, const uint32_t &tj, c
     uint64_t index = {0};
     switch ( static_cast<unsigned short>(ordering_) ) {
         case static_cast<unsigned short>(Ordering::TileMatrixColumnMajorTileColumnMajor):
-            index += ((tj != (this->q_ - 1)) || ((this->n_) % (this->nb_) == 0)) ? ti * (this->mb_) * (this->nb_) : ti * (this->nb_) * ((this->n_) % (this->nb_));
+            index += ti * (this->mb_) * Matrix<T>::nb(ti, tj);
             index += tj * (this->m_) * (this->nb_);
-            index += ((ti != (this->p_ - 1)) || ((this->m_) % (this->mb_) == 0)) ? j * (this->mb_) : j * ((this->m_) % (this->mb_));
+            index += j * Matrix<T>::mb(ti, tj);
             index += i;
             break;
         case static_cast<unsigned short>(Ordering::TileMatrixRowMajorTileColumnMajor):
             index += ti * (this->mb_) * (this->n_);
-            index += ((ti != (this->p_ - 1)) || ((this->m_) % (this->mb_) == 0)) ? tj * (this->mb_) * (this->nb_) : tj * ((this->m_) % (this->mb_)) * (this->nb_);
-            index += ((ti != (this->p_ - 1)) || ((this->m_) % (this->mb_) == 0)) ? j * (this->mb_) : j * ((this->m_) % (this->mb_));
+            index += tj * Matrix<T>::mb(ti, tj) * (this->nb_);
+            index += j * Matrix<T>::mb(ti, tj);
             index += i;
             break;
         case static_cast<unsigned short>(Ordering::TileMatrixColumnMajorTileRowMajor):
-            index += ((tj != (this->q_ - 1)) || ((this->n_) % (this->nb_) == 0)) ? ti * (this->mb_) * (this->nb_) : ti * (this->nb_) * ((this->n_) % (this->nb_));
+            index += ti * (this->mb_) * Matrix<T>::nb(ti, tj);
             index += tj * (this->m_) * (this->nb_);
-            index += ((tj != (this->q_ - 1)) || ((this->n_) % (this->nb_) == 0)) ? i * (this->nb_) : i * ((this->n_) % (this->nb_));
+            index += i * Matrix<T>::nb(ti, tj);
             index += j;
+            break;
         case static_cast<unsigned short>(Ordering::TileMatrixRowMajorTileRowMajor):
             index += ti * (this->mb_) * (this->n_);
-            index += ((ti != (this->p_ - 1)) || ((this->m_) % (this->mb_) == 0)) ? tj * (this->mb_) * (this->nb_) : tj * ((this->m_) % (this->mb_)) * (this->nb_);
-            index += ((tj != (this->q_ - 1)) || ((this->n_) % (this->nb_) == 0)) ? i * (this->nb_) : i * ((this->n_) % (this->nb_));
+            index += tj * Matrix<T>::mb(ti, tj) * (this->nb_);
+            index += i * Matrix<T>::nb(ti, tj);
             index += j;
+            break;
         default:
             break;
     }
