@@ -185,7 +185,7 @@ public:
      * @brief (ti,tj)がタイルの最後の場合には、行の端数を返し、それ以外の場合にはタイルの行数を返す。
      */
     uint32_t mb(const int ti, const int tj) const {
-        return (ti == (this->p_ - 1) ? (this->m_) % (this->mb_) : this->mb_);
+        return ( ( (this->m_) % (this->mb_) == 0) || (ti != ( (this->p_) - 1) ) ) ? (this->mb_) : (this->m_) % (this->mb_);
     }
     /**
      * @brief タイルの列数を取得するゲッター。
@@ -195,7 +195,7 @@ public:
      * @brief (ti,tj)がタイルの最後の場合には、列の端数を返し、それ以外の場合にはタイルの列数を返す。
      */
     uint32_t nb(const int ti, const int tj) const {
-        return (tj == (this->q_ - 1) ? (this->n_) % (this->nb_) : this->nb_);
+        return ( ( (this->n_) % (this->nb_) == 0) || (tj != ( (this->q_) - 1) ) ) ? (this->nb_) : (this->n_) % (this->nb_);
     }
     /**
      * @brief 行方向のタイル数を取得するゲッター。
@@ -287,13 +287,10 @@ public:
     friend std::ostream& operator<< (std::ostream &os, const Matrix<T> &ma){
         uint32_t m = ma.m();
         uint32_t n = ma.n();
-        uint32_t mb = ma.mb();
-        uint32_t nb = ma.nb();
 
-        for (uint32_t i = 0; i < m; i++) {
-            for (uint32_t j = 0; j < n; j++) {
-
-                os << ma( i, j) << " ";
+        for (uint32_t i = 0; i < m; ++i) {
+            for (uint32_t j = 0; j < n; ++j) {
+                os << ma(i, j) << " ";
             }
             os << std::endl;
         }
