@@ -361,26 +361,26 @@ void Matrix<T>::zero() {
 template<typename T>
 uint64_t Matrix<T>::convertTileToArray(const uint32_t &ti, const uint32_t &tj, const uint32_t &i, const uint32_t &j) const{
     uint64_t index = {0};
-    switch ( static_cast<unsigned short>(ordering_) ) {
-        case static_cast<unsigned short>(Ordering::TileMatrixColumnMajorTileColumnMajor):
+    switch ( static_cast<std::underlying_type<Ordering>::type>(ordering_) ) {
+        case static_cast<std::underlying_type<Ordering>::type>(Ordering::TileMatrixColumnMajorTileColumnMajor):
             index += ti * (this->mb_) * Matrix<T>::nb(ti, tj);
             index += tj * (this->m_) * (this->nb_);
             index += j * Matrix<T>::mb(ti, tj);
             index += i;
             break;
-        case static_cast<unsigned short>(Ordering::TileMatrixRowMajorTileColumnMajor):
+        case static_cast<std::underlying_type<Ordering>::type>(Ordering::TileMatrixRowMajorTileColumnMajor):
             index += ti * (this->mb_) * (this->n_);
             index += tj * Matrix<T>::mb(ti, tj) * (this->nb_);
             index += j * Matrix<T>::mb(ti, tj);
             index += i;
             break;
-        case static_cast<unsigned short>(Ordering::TileMatrixColumnMajorTileRowMajor):
+        case static_cast<std::underlying_type<Ordering>::type>(Ordering::TileMatrixColumnMajorTileRowMajor):
             index += ti * (this->mb_) * Matrix<T>::nb(ti, tj);
             index += tj * (this->m_) * (this->nb_);
             index += i * Matrix<T>::nb(ti, tj);
             index += j;
             break;
-        case static_cast<unsigned short>(Ordering::TileMatrixRowMajorTileRowMajor):
+        case static_cast<std::underlying_type<Ordering>::type>(Ordering::TileMatrixRowMajorTileRowMajor):
             index += ti * (this->mb_) * (this->n_);
             index += tj * Matrix<T>::mb(ti, tj) * (this->nb_);
             index += i * Matrix<T>::nb(ti, tj);

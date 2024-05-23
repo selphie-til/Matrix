@@ -172,39 +172,39 @@ public:
     /**
      * @brief 行数を取得するゲッター。
      */
-    uint32_t m() const { return this->m_; }
+    [[nodiscard]] uint32_t m() const { return this->m_; }
     /**
      * @brief 列数を取得するゲッター。
      */
-    uint32_t n() const { return this->n_; }
+    [[nodiscard]] uint32_t n() const { return this->n_; }
     /**
      * @brief タイルの行数を取得するゲッター。
      */
-    uint32_t mb() const { return this->mb_; }
+    [[nodiscard]] uint32_t mb() const { return this->mb_; }
     /**
      * @brief (ti,tj)がタイルの最後の場合には、行の端数を返し、それ以外の場合にはタイルの行数を返す。
      */
-    uint32_t mb(const int ti, const int tj) const {
+    [[nodiscard]] uint32_t mb(const int ti, const int tj) const {
         return ( ( (this->m_) % (this->mb_) == 0) || (ti != ( (this->p_) - 1) ) ) ? (this->mb_) : (this->m_) % (this->mb_);
     }
     /**
      * @brief タイルの列数を取得するゲッター。
      */
-    uint32_t nb() const { return this->nb_; }
+    [[nodiscard]] uint32_t nb() const { return this->nb_; }
     /**
      * @brief (ti,tj)がタイルの最後の場合には、列の端数を返し、それ以外の場合にはタイルの列数を返す。
      */
-    uint32_t nb(const int ti, const int tj) const {
+    [[nodiscard]] uint32_t nb(const int ti, const int tj) const {
         return ( ( (this->n_) % (this->nb_) == 0) || (tj != ( (this->q_) - 1) ) ) ? (this->nb_) : (this->n_) % (this->nb_);
     }
     /**
      * @brief 行方向のタイル数を取得するゲッター。
      */
-    uint32_t p() const { return this->p_; }
+    [[nodiscard]] uint32_t p() const { return this->p_; }
     /**
      * @brief 列方向のタイル数を取得するゲッター。
      */
-    uint32_t q() const { return this->q_; }
+    [[nodiscard]] uint32_t q() const { return this->q_; }
 
     /**
      * @brief 行列の要素にランダムな数値を代入するメソッド。
@@ -313,6 +313,6 @@ private:
  * @param j  タイル内の列インデックスです。
  * @return 計算された1次元配列のインデックスを返します。
  */
-    uint64_t convertTileToArray(const uint32_t &ti, const uint32_t &tj,
-                                const uint32_t &i, const uint32_t &j) const;
+    [[nodiscard]] uint64_t convertTileToArray(const uint32_t &ti, const uint32_t &tj,
+                                              const uint32_t &i, const uint32_t &j) const;
 };
