@@ -207,6 +207,25 @@ public:
     [[nodiscard]] uint32_t q() const { return this->q_; }
 
     /**
+     * @brief set_ts メソッドは、新しいタイルサイズを設定します。
+     *
+     * @details この関数は、指定したタイルサイズで新しい行列を作成し、元の行列のデータを新しい行列にコピーします。
+     * 新しい行列が作成された後、元の行列は新しい行列に置き換えられます。
+     * タイルサイズが0未満の場合はアサートで失敗します。
+     *
+     * @param ts 新しいタイルサイズ。
+     */
+    void set_ts(uint32_t ts);
+
+    /**
+     * @brief Matrix<T>::set_ts() メソッドは、Matrix<T> オブジェクトのタイルサイズを設定します。
+     *
+     * @param mb    新しい行のタイルサイズ (1より大きい必要があります)
+     * @param nb    新しい列のタイルサイズ (1より大きい必要があります)
+     */
+    void set_ts(uint32_t mb, uint32_t nb);
+
+    /**
      * @brief 行列の要素にランダムな数値を代入するメソッド。
      */
     void gen_rnd_elm();
