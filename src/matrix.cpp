@@ -395,6 +395,53 @@ uint64_t Matrix<T>::convertTileToArray(const uint32_t &ti, const uint32_t &tj, c
     return index;
 }
 
+/**
+ * @brief set_ts メソッドは、新しいタイルサイズを設定します。
+ *
+ * @details この関数は、指定したタイルサイズで新しい行列を作成し、元の行列のデータを新しい行列にコピーします。
+ * 新しい行列が作成された後、元の行列は新しい行列に置き換えられます。
+ * タイルサイズが0未満の場合はアサートで失敗します。
+ *
+ * @param ts 新しいタイルサイズ。
+ */
+template<typename T>
+void Matrix<T>::set_ts(uint32_t ts) {
+    assert( ts > 0);
+
+    Matrix new_matrix( m_, n_, ts, ordering_);
+
+    for( uint32_t i=0; i<m_; ++i){
+        for(uint32_t j=0; j<n_; ++j){
+            new_matrix(i,j) = this->operator()(i,j);
+        }
+    }
+
+    *this = std::move(new_matrix);
+}
+
+/**
+   * @brief Matrix<T>::set_ts() メソッドは、Matrix<T> オブジェクトのタイルサイズを設定します。
+   *
+   * @param mb    新しい行のタイルサイズ (1より大きい必要があります)
+   * @param nb    新しい列のタイルサイズ (1より大きい必要があります)
+   */
+template<typename T>
+void Matrix<T>::set_ts(uint32_t mb, uint32_t nb) {
+    assert( mb > 0);
+    assert( nb > 0);
+
+    Matrix new_matrix( m_, n_, mb, nb, ordering_);
+
+    for( uint32_t i=0; i<m_; ++i){
+        for(uint32_t j=0; j<n_; ++j){
+            new_matrix(i,j) = this->operator()(i,j);
+        }
+    }
+
+    *this = std::move(new_matrix);
+}
+
+
 //! フロート値用のMatrix特化クラス
 /*! このクラスはMatrixクラスのfloat特化版です。具体的な演算の実装を行っています。 */
 template class Matrix<float>;
