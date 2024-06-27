@@ -22,6 +22,26 @@ Matrix<T>::~Matrix() {
 }
 
 /**
+ * @brief (ti,tj)がタイルの最後の場合には、行の端数を返し、それ以外の場合にはタイルの行数を返す。
+ */
+template<typename T>
+uint32_t Matrix<T>::mb(const uint32_t &ti, const uint32_t &tj) const {
+    assert( ti < this->p_);
+    assert( tj < this->q_);
+    return ( ( (this->m_) % (this->mb_) == 0) || (ti != ( (this->p_) - 1) ) ) ? (this->mb_) : (this->m_) % (this->mb_);
+}
+
+/**
+ * @brief (ti,tj)がタイルの最後の場合には、列の端数を返し、それ以外の場合にはタイルの列数を返す。
+ */
+template<typename T>
+uint32_t Matrix<T>::nb(const uint32_t &ti, const uint32_t &tj) const {
+    assert( ti < this->p_);
+    assert( tj < this->q_);
+    return ( ( (this->n_) % (this->nb_) == 0) || (tj != ( (this->q_) - 1) ) ) ? (this->nb_) : (this->n_) % (this->nb_);
+}
+
+/**
  * @brief マトリクスの要素にランダムな数を割り当てます。
  *
  * この関数は標準の乱数生成器を使用してマトリクスのすべての要素にランダムな実数を割り当てます。
@@ -55,9 +75,7 @@ void Matrix<T>::gen_rnd_elm() {
  */
 template<typename T>
 T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj) const {
-    assert(ti >= 0);
     assert(ti < (this->p_));
-    assert(tj >= 0);
     assert(tj < (this->q_));
 
     uint32_t pos = Matrix<T>::convertTileToArray(ti, tj, 0, 0);
@@ -85,14 +103,10 @@ T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj) const {
 template<typename T>
 T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj,
                   const uint32_t &i, const uint32_t &j) const {
-    assert(i >= 0);
     assert(i < (ti == (this->p_ - 1) ? (this->m_) % (this->mb_) : this->mb_));
-    assert(j >= 0);
     assert(j < (tj == (this->q_ - 1) ? (this->n_) % (this->nb_) : this->nb_));
 
-    assert(ti >= 0);
     assert(ti < this->p_);
-    assert(tj >= 0);
     assert(tj < this->q_);
 
     uint64_t pos = Matrix<T>::convertTileToArray( ti, tj, i, j);
@@ -297,7 +311,6 @@ bool Matrix<T>::operator==(const Matrix<T> &M) {
  */
 template<typename T>
 T &Matrix<T>::operator[](const uint64_t &i) const {
-    assert(i >= 0);
     assert(i < (this->m_)*(this->n_));
 
     return top_[i];
@@ -315,9 +328,7 @@ T &Matrix<T>::operator[](const uint64_t &i) const {
  */
 template<typename T>
 T &Matrix<T>::operator()(const uint32_t &i, const uint32_t &j) const {
-    assert(i >= 0);
     assert(i < (this->m_));
-    assert(j >= 0);
     assert(j < (this->n_));
 
     const uint32_t ti = i / this->mb_;
@@ -406,7 +417,8 @@ uint64_t Matrix<T>::convertTileToArray(const uint32_t &ti, const uint32_t &tj, c
  */
 template<typename T>
 void Matrix<T>::set_ts(uint32_t ts) {
-    assert( ts > 0);
+    assert( ts < m_ );
+    assert( ts < n_ );
 
     Matrix new_matrix( m_, n_, ts, ordering_);
 
@@ -427,8 +439,8 @@ void Matrix<T>::set_ts(uint32_t ts) {
    */
 template<typename T>
 void Matrix<T>::set_ts(uint32_t mb, uint32_t nb) {
-    assert( mb > 0);
-    assert( nb > 0);
+    assert( mb < m_);
+    assert( nb < n_);
 
     Matrix new_matrix( m_, n_, mb, nb, ordering_);
 

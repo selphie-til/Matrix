@@ -44,10 +44,6 @@ class Matrix {
 
 protected:
     /**
-     * @brief 行列の先頭への一意なポインタ。
-     */
-    std::unique_ptr<T[]> top_;     // pointer to the matrix
-    /**
      * @brief 行列の行数。
      */
     uint32_t m_;  // number of lows of the matrix or lda
@@ -71,6 +67,11 @@ protected:
      * @brief 列方向のタイル数。
      */
     uint32_t q_;  // number of column tiles
+
+    /**
+     * @brief 行列の先頭への一意なポインタ。
+     */
+    std::unique_ptr<T[]> top_;     // pointer to the matrix
 
     /**
      * @brief オーダリングオブジェクト
@@ -184,9 +185,7 @@ public:
     /**
      * @brief (ti,tj)がタイルの最後の場合には、行の端数を返し、それ以外の場合にはタイルの行数を返す。
      */
-    [[nodiscard]] uint32_t mb(const int ti, const int tj) const {
-        return ( ( (this->m_) % (this->mb_) == 0) || (ti != ( (this->p_) - 1) ) ) ? (this->mb_) : (this->m_) % (this->mb_);
-    }
+    [[nodiscard]] uint32_t mb(const uint32_t &ti, const uint32_t &tj) const;
     /**
      * @brief タイルの列数を取得するゲッター。
      */
@@ -194,9 +193,7 @@ public:
     /**
      * @brief (ti,tj)がタイルの最後の場合には、列の端数を返し、それ以外の場合にはタイルの列数を返す。
      */
-    [[nodiscard]] uint32_t nb(const int ti, const int tj) const {
-        return ( ( (this->n_) % (this->nb_) == 0) || (tj != ( (this->q_) - 1) ) ) ? (this->nb_) : (this->n_) % (this->nb_);
-    }
+    [[nodiscard]] uint32_t nb(const uint32_t &ti, const uint32_t &tj) const;
     /**
      * @brief 行方向のタイル数を取得するゲッター。
      */
