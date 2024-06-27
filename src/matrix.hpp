@@ -44,10 +44,6 @@ class Matrix {
 
 protected:
     /**
-     * @brief 行列の先頭への一意なポインタ。
-     */
-    std::unique_ptr<T[]> top_;     // pointer to the matrix
-    /**
      * @brief 行列の行数。
      */
     uint32_t m_;  // number of lows of the matrix or lda
@@ -71,6 +67,11 @@ protected:
      * @brief 列方向のタイル数。
      */
     uint32_t q_;  // number of column tiles
+
+    /**
+     * @brief 行列の先頭への一意なポインタ。
+     */
+    std::unique_ptr<T[]> top_;     // pointer to the matrix
 
     /**
      * @brief オーダリングオブジェクト
