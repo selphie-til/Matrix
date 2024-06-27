@@ -185,6 +185,10 @@ public:
      * @brief (ti,tj)がタイルの最後の場合には、行の端数を返し、それ以外の場合にはタイルの行数を返す。
      */
     [[nodiscard]] uint32_t mb(const int ti, const int tj) const {
+        assert( 0 <= ti );
+        assert( 0 <= tj );
+        assert( ti < this->p_);
+        assert( tj < this->q_);
         return ( ( (this->m_) % (this->mb_) == 0) || (ti != ( (this->p_) - 1) ) ) ? (this->mb_) : (this->m_) % (this->mb_);
     }
     /**
@@ -195,6 +199,10 @@ public:
      * @brief (ti,tj)がタイルの最後の場合には、列の端数を返し、それ以外の場合にはタイルの列数を返す。
      */
     [[nodiscard]] uint32_t nb(const int ti, const int tj) const {
+        assert( 0 <= ti );
+        assert( 0 <= tj );
+        assert( ti < this->p_);
+        assert( tj < this->q_);
         return ( ( (this->n_) % (this->nb_) == 0) || (tj != ( (this->q_) - 1) ) ) ? (this->nb_) : (this->n_) % (this->nb_);
     }
     /**
