@@ -439,8 +439,8 @@ void Matrix<T>::set_ts(uint32_t ts) {
    */
 template<typename T>
 void Matrix<T>::set_ts(uint32_t mb, uint32_t nb) {
-    assert( mb < m_);
-    assert( nb < n_);
+    assert( mb <= m_);
+    assert( nb <= n_);
 
     Matrix new_matrix( m_, n_, mb, nb, ordering_);
 
