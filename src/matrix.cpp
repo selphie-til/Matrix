@@ -103,8 +103,8 @@ T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj) const {
 template<typename T>
 T* Matrix<T>::elm(const uint32_t &ti, const uint32_t &tj,
                   const uint32_t &i, const uint32_t &j) const {
-    assert(i < (ti == (this->p_ - 1) ? (this->m_) % (this->mb_) : this->mb_));
-    assert(j < (tj == (this->q_ - 1) ? (this->n_) % (this->nb_) : this->nb_));
+    assert(i < (ti == (this->p_ - 1) ? (this->m_) % (this->mb_) == 0 ? this->mb_ : (this->m_) % (this->mb_) : this->mb_));
+    assert(j < (tj == (this->q_ - 1) ? (this->n_) % (this->nb_) == 0 ? this->nb_ : (this->n_) % (this->nb_) : this->nb_));
 
     assert(ti < this->p_);
     assert(tj < this->q_);
