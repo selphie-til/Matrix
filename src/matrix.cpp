@@ -401,7 +401,7 @@ uint64_t Matrix<T>::convertTileToArray(const uint32_t &ti, const uint32_t &tj, c
             break;
     }
 
-    assert( index < (this->m_) * (this->n_));
+    assert( index < static_cast<uint64_t>((this->m_)) * static_cast<uint64_t>((this->n_)));
 
     return index;
 }
