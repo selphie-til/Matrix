@@ -99,7 +99,7 @@ public:
            const Ordering ordering=Ordering::TileMatrixColumnMajorTileColumnMajor)
            :m_{m}, n_{n},
             mb_{m}, nb_{n},
-            p_{1}, q_{1}, top_{std::make_unique<T[]>(m*n)},
+            p_{1}, q_{1}, top_{std::make_unique<T[]>(static_cast<uint64_t>(m)*static_cast<uint64_t>(n))},
             ordering_{ordering} {};
     /**
      * @brief 行列のサイズとタイルのサイズを指定するコンストラクタ。
@@ -113,7 +113,7 @@ public:
             mb_{ts}, nb_{ts},
             p_{(m % ts == 0) ? m / ts : m / ts + 1},
             q_{(n % ts == 0) ? n / ts : n / ts + 1},
-            top_{std::make_unique<T[]>(m*n)},
+            top_{std::make_unique<T[]>(static_cast<uint64_t>(m)*static_cast<uint64_t>(n))},
             ordering_{ordering} {};
     /**
      * @brief  行列のサイズとタイルのサイズを指定するコンストラクタ。
@@ -129,7 +129,7 @@ public:
             mb_{mb}, nb_{nb},
             p_{(m % mb == 0) ? m / mb : m / mb + 1},
             q_{(n % nb == 0) ? n / nb : n / nb + 1},
-            top_{std::make_unique<T[]>(m*n)},
+            top_{std::make_unique<T[]>(static_cast<uint64_t>(m)*static_cast<uint64_t>(n))},
             ordering_{ordering} {};
 
     /**
