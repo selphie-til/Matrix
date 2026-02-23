@@ -374,28 +374,28 @@ uint64_t Matrix<T>::convertTileToArray(const uint32_t &ti, const uint32_t &tj, c
     uint64_t index = {0};
     switch ( static_cast<std::underlying_type<Ordering>::type>(ordering_) ) {
         case static_cast<std::underlying_type<Ordering>::type>(Ordering::TileMatrixColumnMajorTileColumnMajor):
-            index += ti * (this->mb_) * Matrix<T>::nb(ti, tj);
-            index += tj * (this->m_) * (this->nb_);
-            index += j * Matrix<T>::mb(ti, tj);
-            index += i;
+            index += static_cast<uint64_t>(ti) * static_cast<uint64_t>(this->mb_) * static_cast<uint64_t>(Matrix<T>::nb(ti, tj));
+            index += static_cast<uint64_t>(tj) * static_cast<uint64_t>(this->m_) * static_cast<uint64_t>(this->nb_);
+            index += static_cast<uint64_t>(j) * static_cast<uint64_t>(Matrix<T>::mb(ti, tj));
+            index += static_cast<uint64_t>(i);
             break;
         case static_cast<std::underlying_type<Ordering>::type>(Ordering::TileMatrixRowMajorTileColumnMajor):
-            index += ti * (this->mb_) * (this->n_);
-            index += tj * Matrix<T>::mb(ti, tj) * (this->nb_);
-            index += j * Matrix<T>::mb(ti, tj);
-            index += i;
+            index += static_cast<uint64_t>(ti) * static_cast<uint64_t>(this->mb_) * static_cast<uint64_t>(this->n_);
+            index += static_cast<uint64_t>(tj) * static_cast<uint64_t>(Matrix<T>::mb(ti, tj)) * static_cast<uint64_t>(this->nb_);
+            index += static_cast<uint64_t>(j) * static_cast<uint64_t>(Matrix<T>::mb(ti, tj));
+            index += static_cast<uint64_t>(i);
             break;
         case static_cast<std::underlying_type<Ordering>::type>(Ordering::TileMatrixColumnMajorTileRowMajor):
-            index += ti * (this->mb_) * Matrix<T>::nb(ti, tj);
-            index += tj * (this->m_) * (this->nb_);
-            index += i * Matrix<T>::nb(ti, tj);
-            index += j;
+            index += static_cast<uint64_t>(ti) * static_cast<uint64_t>(this->mb_) * static_cast<uint64_t>(Matrix<T>::nb(ti, tj));
+            index += static_cast<uint64_t>(tj) * static_cast<uint64_t>(this->m_) * static_cast<uint64_t>(this->nb_);
+            index += static_cast<uint64_t>(i) * static_cast<uint64_t>(Matrix<T>::nb(ti, tj));
+            index += static_cast<uint64_t>(j);
             break;
         case static_cast<std::underlying_type<Ordering>::type>(Ordering::TileMatrixRowMajorTileRowMajor):
-            index += ti * (this->mb_) * (this->n_);
-            index += tj * Matrix<T>::mb(ti, tj) * (this->nb_);
-            index += i * Matrix<T>::nb(ti, tj);
-            index += j;
+            index += static_cast<uint64_t>(ti) * static_cast<uint64_t>(this->mb_) * static_cast<uint64_t>(this->n_);
+            index += static_cast<uint64_t>(tj) * static_cast<uint64_t>(Matrix<T>::mb(ti, tj)) * static_cast<uint64_t>(this->nb_);
+            index += static_cast<uint64_t>(i) * static_cast<uint64_t>(Matrix<T>::nb(ti, tj));
+            index += static_cast<uint64_t>(j);
             break;
         default:
             break;
