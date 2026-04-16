@@ -146,7 +146,7 @@ public:
                             ordering_{M.ordering_}
     {
         if( M.top_ != nullptr) {
-            std::copy((M.top_).get(), (M.top_).get() + M.m_ * M.n_, top_.get());
+            std::copy((M.top_).get(), (M.top_).get() + static_cast<uint64_t>(M.m_) * M.n_, top_.get());
         }
     }
 

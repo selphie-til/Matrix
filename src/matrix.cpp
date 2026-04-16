@@ -199,7 +199,7 @@ Matrix<T> Matrix<T>::addElements(const Matrix<T> &M) const {
     assert(this->m_ == M.m_);
     assert(this->n_ == M.n_);
 
-    Matrix N(this->m_, this->n_, this->mb_, this->nb_);
+    Matrix N(this->m_, this->n_, this->mb_, this->nb_, this->ordering_);
     uint64_t totalElements = static_cast<uint64_t>(this->m_) * (this->n_);
     for( uint64_t i=0; i<totalElements; ++i){
         N[i] = (*this)[i] + M[i];
@@ -245,7 +245,7 @@ Matrix<T> Matrix<T>::minusElements(const Matrix<T> &M) const{
     assert(this->m_ == M.m_);
     assert(this->n_ == M.n_);
 
-    Matrix N( this->m_, this->n_, this->mb_, this->nb_);
+    Matrix N( this->m_, this->n_, this->mb_, this->nb_, this->ordering_);
     uint64_t totalElements = static_cast<uint64_t>(this->m_) * (this->n_);
     for( uint64_t i=0; i<totalElements; ++i){
         N[i] = (*this)[i] - M[i];
@@ -312,7 +312,7 @@ bool Matrix<T>::operator==(const Matrix<T> &M) const {
  */
 template<typename T>
 T &Matrix<T>::operator[](const uint64_t &i) const {
-    assert(i < (this->m_)*(this->n_));
+    assert(i < static_cast<uint64_t>(this->m_) * (this->n_));
 
     return top_[i];
 }
