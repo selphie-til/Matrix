@@ -142,7 +142,7 @@ public:
      * @param M コピー元のMatrixオブジェクト
      */
     Matrix(const Matrix& M):m_{M.m_}, n_{M.n_}, mb_{M.mb_}, nb_{M.nb_},
-                            p_{M.p_}, q_{M.q_}, top_{std::make_unique<T[]>(M.m_*M.n_)},
+                            p_{M.p_}, q_{M.q_}, top_{std::make_unique<T[]>(static_cast<uint64_t>(M.m_)*M.n_)},
                             ordering_{M.ordering_}
     {
         if( M.top_ != nullptr) {
@@ -280,7 +280,7 @@ public:
      * @param M 比較元のMatrixオブジェクト。
      * @return 同等であればtrue、そうでなければfalseを返す。
      */
-    bool operator==(const Matrix &M);
+    bool operator==(const Matrix &M) const;
     /**
      * @brief 添字演算子のオーバーロード。
      * @param i アクセスする要素の位置。
