@@ -237,6 +237,16 @@ public:
      */
     void bernoulli(uint32_t seed = 20260107);
     /**
+     * @brief 行列の全要素を Achlioptas 分布で初期化するメソッド。
+     *
+     * 各要素は以下の確率で設定されます：
+     *   - 確率 1/6 : +1
+     *   - 確率 1/6 : -1
+     *   - 確率 2/3 :  0
+     * @param seed 乱数シード（デフォルト: 20260107）
+     */
+    void achlioptas(uint32_t seed = 20260107);
+    /**
      * @brief (ti,tj)要素へのポインタを返す。
      */
     T *elm(const uint32_t &ti, const uint32_t &tj) const;

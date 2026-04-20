@@ -60,6 +60,17 @@ void Matrix<T>::bernoulli(uint32_t seed) {
 }
 
 template<typename T>
+void Matrix<T>::achlioptas(uint32_t seed) {
+    std::mt19937 gen(seed);
+    // 区間 [0, 5] の一様整数分布: 0–1 → +1, 2–3 → -1, 4–5 → 0
+    std::uniform_int_distribution<int> dist(0, 5);
+    for (uint64_t i = 0; i < static_cast<uint64_t>(m_) * n_; ++i) {
+        int r = dist(gen);
+        top_.get()[i] = (r == 0) ? T(1) : (r == 1) ? T(-1) : T(0);
+    }
+}
+
+template<typename T>
 void Matrix<T>::gauss(uint32_t seed) {
     std::mt19937 gen(seed);
     std::normal_distribution<T> dist(0.0, 1.0);
