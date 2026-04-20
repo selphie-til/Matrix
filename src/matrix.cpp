@@ -51,13 +51,31 @@ uint32_t Matrix<T>::nb(const uint32_t &ti, const uint32_t &tj) const {
  * 乱数の範囲は0.0から1.0までです。
  */
 template<typename T>
+void Matrix<T>::bernoulli(uint32_t seed) {
+    std::mt19937 gen(seed);
+    std::bernoulli_distribution dist(0.5);
+    for (uint64_t i = 0; i < static_cast<uint64_t>(m_) * n_; ++i) {
+        top_.get()[i] = dist(gen) ? T(1) : T(-1);
+    }
+}
+
+template<typename T>
+void Matrix<T>::gauss(uint32_t seed) {
+    std::mt19937 gen(seed);
+    std::normal_distribution<T> dist(0.0, 1.0);
+    for (uint64_t i = 0; i < static_cast<uint64_t>(m_) * n_; ++i) {
+        top_.get()[i] = dist(gen);
+    }
+}
+
+template<typename T>
 void Matrix<T>::gen_rnd_elm() {
     // 乱数生成器
     std::random_device rdev;
     // ランダムなシードの設定
     std::mt19937 engine(rdev());
     std::uniform_real_distribution<T> dist(0.0, 1.0);
-    for (uint64_t i = 0; i < m_*n_; ++i) {
+    for (uint64_t i = 0; i < static_cast<uint64_t>(m_)*n_; ++i) {
         ((this->top_).get())[i] = dist(engine);
     }
 }
@@ -175,8 +193,9 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T> &M){
     this->nb_ = M.nb_;
     this->p_ = M.p_;
     this->q_ = M.q_;
+    this->ordering_ = M.ordering_;
 
-    for (uint64_t i = 0; i < (this->m_)*(this->n_); i++)
+    for (uint64_t i = 0; i < static_cast<uint64_t>(this->m_)*static_cast<uint64_t>(this->n_); i++)
         (this->top_).get()[i] = (M.top_).get()[i];
 
     return *this;
@@ -198,8 +217,8 @@ Matrix<T> Matrix<T>::addElements(const Matrix<T> &M) const {
     assert(this->m_ == M.m_);
     assert(this->n_ == M.n_);
 
-    Matrix N(this->m_, this->n_, this->mb_, this->nb_);
-    uint64_t totalElements = (this->m_) * (this->n_);
+    Matrix N(this->m_, this->n_, this->mb_, this->nb_, this->ordering_);
+    uint64_t totalElements = static_cast<uint64_t>(this->m_) * (this->n_);
     for( uint64_t i=0; i<totalElements; ++i){
         N[i] = (*this)[i] + M[i];
     }
@@ -244,8 +263,8 @@ Matrix<T> Matrix<T>::minusElements(const Matrix<T> &M) const{
     assert(this->m_ == M.m_);
     assert(this->n_ == M.n_);
 
-    Matrix N( this->m_, this->n_, this->mb_, this->nb_);
-    uint64_t totalElements = (this->m_) * (this->n_);
+    Matrix N( this->m_, this->n_, this->mb_, this->nb_, this->ordering_);
+    uint64_t totalElements = static_cast<uint64_t>(this->m_) * (this->n_);
     for( uint64_t i=0; i<totalElements; ++i){
         N[i] = (*this)[i] - M[i];
     }
@@ -285,11 +304,11 @@ Matrix<T> Matrix<T>::operator-(const Matrix<T> &M) const {
  * すべての要素が一致する場合、演算子はtrueを返します。
  */
 template<typename T>
-bool Matrix<T>::operator==(const Matrix<T> &M) {
+bool Matrix<T>::operator==(const Matrix<T> &M) const {
     if(m_ != M.m_ || n_ != M.n_) {
         return false;
     }
-    for (uint64_t i = 0; i < m_*n_; i++) {
+    for (uint64_t i = 0; i < static_cast<uint64_t>(m_)*n_; i++) {
         if (this->top_[i] != M.top_[i]){
             return false;
         }
@@ -311,7 +330,7 @@ bool Matrix<T>::operator==(const Matrix<T> &M) {
  */
 template<typename T>
 T &Matrix<T>::operator[](const uint64_t &i) const {
-    assert(i < (this->m_)*(this->n_));
+    assert(i < static_cast<uint64_t>(this->m_) * (this->n_));
 
     return top_[i];
 }
@@ -352,7 +371,7 @@ T &Matrix<T>::operator()(const uint32_t &i, const uint32_t &j) const {
 template<typename T>
 void Matrix<T>::zero() {
 
-    std::fill(top_.get(), top_.get() + (this->m_) + (this->n_), 0);
+    std::fill(top_.get(), top_.get() + static_cast<uint64_t>(this->m_) * (this->n_), 0);
 
 }
 
@@ -417,8 +436,8 @@ uint64_t Matrix<T>::convertTileToArray(const uint32_t &ti, const uint32_t &tj, c
  */
 template<typename T>
 void Matrix<T>::set_ts(uint32_t ts) {
-    assert( ts < m_ );
-    assert( ts < n_ );
+    assert( ts <= m_ );
+    assert( ts <= n_ );
 
     Matrix new_matrix( m_, n_, ts, ordering_);
 

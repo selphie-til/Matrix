@@ -142,11 +142,11 @@ public:
      * @param M コピー元のMatrixオブジェクト
      */
     Matrix(const Matrix& M):m_{M.m_}, n_{M.n_}, mb_{M.mb_}, nb_{M.nb_},
-                            p_{M.p_}, q_{M.q_}, top_{std::make_unique<T[]>(M.m_*M.n_)},
+                            p_{M.p_}, q_{M.q_}, top_{std::make_unique<T[]>(static_cast<uint64_t>(M.m_)*M.n_)},
                             ordering_{M.ordering_}
     {
         if( M.top_ != nullptr) {
-            std::copy((M.top_).get(), (M.top_).get() + M.m_ * M.n_, top_.get());
+            std::copy((M.top_).get(), (M.top_).get() + static_cast<uint64_t>(M.m_) * M.n_, top_.get());
         }
     }
 
@@ -227,6 +227,16 @@ public:
      */
     void gen_rnd_elm();
     /**
+     * @brief 行列の全要素を標準正規分布 N(0,1) の乱数で初期化するメソッド。
+     * @param seed 乱数シード（デフォルト: 20260107）
+     */
+    void gauss(uint32_t seed = 20260107);
+    /**
+     * @brief 行列の全要素を +1 または -1（各 50% の確率）で初期化するメソッド。
+     * @param seed 乱数シード（デフォルト: 20260107）
+     */
+    void bernoulli(uint32_t seed = 20260107);
+    /**
      * @brief (ti,tj)要素へのポインタを返す。
      */
     T *elm(const uint32_t &ti, const uint32_t &tj) const;
@@ -280,7 +290,7 @@ public:
      * @param M 比較元のMatrixオブジェクト。
      * @return 同等であればtrue、そうでなければfalseを返す。
      */
-    bool operator==(const Matrix &M);
+    bool operator==(const Matrix &M) const;
     /**
      * @brief 添字演算子のオーバーロード。
      * @param i アクセスする要素の位置。
