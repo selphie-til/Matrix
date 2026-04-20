@@ -227,6 +227,16 @@ public:
      */
     void gen_rnd_elm();
     /**
+     * @brief 行列の全要素を標準正規分布 N(0,1) の乱数で初期化するメソッド。
+     * @param seed 乱数シード（デフォルト: 20260107）
+     */
+    void gauss(uint32_t seed = 20260107);
+    /**
+     * @brief 行列の全要素を +1 または -1（各 50% の確率）で初期化するメソッド。
+     * @param seed 乱数シード（デフォルト: 20260107）
+     */
+    void bernoulli(uint32_t seed = 20260107);
+    /**
      * @brief (ti,tj)要素へのポインタを返す。
      */
     T *elm(const uint32_t &ti, const uint32_t &tj) const;

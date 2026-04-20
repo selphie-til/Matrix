@@ -51,6 +51,24 @@ uint32_t Matrix<T>::nb(const uint32_t &ti, const uint32_t &tj) const {
  * 乱数の範囲は0.0から1.0までです。
  */
 template<typename T>
+void Matrix<T>::bernoulli(uint32_t seed) {
+    std::mt19937 gen(seed);
+    std::bernoulli_distribution dist(0.5);
+    for (uint64_t i = 0; i < static_cast<uint64_t>(m_) * n_; ++i) {
+        top_.get()[i] = dist(gen) ? T(1) : T(-1);
+    }
+}
+
+template<typename T>
+void Matrix<T>::gauss(uint32_t seed) {
+    std::mt19937 gen(seed);
+    std::normal_distribution<T> dist(0.0, 1.0);
+    for (uint64_t i = 0; i < static_cast<uint64_t>(m_) * n_; ++i) {
+        top_.get()[i] = dist(gen);
+    }
+}
+
+template<typename T>
 void Matrix<T>::gen_rnd_elm() {
     // 乱数生成器
     std::random_device rdev;
